@@ -4,7 +4,7 @@
   "description": "**Built for Hack2skill Main Challenge 3 — June 2026**",
   "main": "tailwind.config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node tests/calculator.test.js"
   },
   "repository": {
     "type": "git",
