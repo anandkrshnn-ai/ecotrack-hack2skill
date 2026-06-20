@@ -152,6 +152,70 @@
             font-weight: 600;
         }
 
+        /* Design Spells - Glow Cards */
+        .card, .tip-card {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #27272a;
+        }
+        
+        .card:hover, .tip-card:hover {
+            transform: translateY(-4px) scale(1.005);
+            border-color: rgba(16, 185, 129, 0.45);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 25px rgba(16, 185, 129, 0.1);
+        }
+
+        /* Button Sweep Effect */
+        .btn-primary-magic {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+        }
+        
+        .btn-primary-magic:hover {
+            transform: translateY(-2px) scale(1.005);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.45);
+        }
+        
+        .btn-primary-magic::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 30%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.13);
+            transform: rotate(30deg);
+            transition: all 0.5s ease;
+        }
+        
+        .btn-primary-magic:hover::after {
+            left: 150%;
+        }
+
+        /* Logo micro-interaction */
+        .eco-gradient:hover .fa-leaf {
+            animation: leaf-spin 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes leaf-spin {
+            0% { transform: rotate(0deg) scale(1); }
+            45% { transform: rotate(-25deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        /* Toast animation */
+        @keyframes toast-slide-in {
+            0% { transform: translateY(100px) scale(0.9); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        
+        .toast-animate {
+            animation: toast-slide-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
         /* Custom styles for arbitrary Tailwind classes since precompiled tailwind.min.css doesn't dynamically resolve brackets */
         .active\:scale-\[0\.985\]:active { transform: scale(0.985); }
         .h-\[210px\] { height: 210px; }
@@ -818,6 +882,29 @@
         let trendChartInstance = null;
         let currentResults = null;
         
+        // Easing number ticker
+        function animateNumberValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            if (!obj) return;
+            const range = end - start;
+            let startTime = null;
+            
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                const easeProgress = progress * (2 - progress); // outQuad
+                const val = start + (range * easeProgress);
+                obj.textContent = val.toFixed(id === 'total-value' ? 2 : 1);
+                
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.textContent = end.toFixed(id === 'total-value' ? 2 : 1);
+                }
+            }
+            window.requestAnimationFrame(step);
+        }
+        
         function updateSliderValue(id) {
             const slider = document.getElementById(id);
             const numInput = document.getElementById(id + '-num');
@@ -1056,7 +1143,7 @@
                     </div>
                     <div class="flex-1 mx-3">
                         <div class="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                            <div class="h-1.5 bg-${cat.color}-400 rounded-full transition-all" style="width: ${pct}%"></div>
+                            <div class="h-1.5 bg-${cat.color}-400 rounded-full transition-all" style="width: 0%"></div>
                         </div>
                     </div>
                     <div class="font-mono w-16 text-right tabular-nums">
@@ -1065,6 +1152,12 @@
                     </div>
                 `;
                 container.appendChild(div);
+                
+                // Trigger transition delay
+                setTimeout(() => {
+                    const bar = div.querySelector(`.bg-${cat.color}-400`);
+                    if (bar) bar.style.width = `${pct}%`;
+                }, 80);
             });
             
             // Update bar visuals in results header area
@@ -1131,8 +1224,8 @@
             section.classList.remove('hidden');
             section.scrollIntoView({ behavior: 'smooth', block: 'start' });
             
-            // Big number
-            document.getElementById('total-value').textContent = results.total;
+            // Big number (Animated count-up)
+            animateNumberValue('total-value', 0.0, results.total, 950);
             
             // Comparison
             const indianAvg = 5.2;
@@ -1306,7 +1399,7 @@
             
             // Show success toast-ish
             const toast = document.createElement('div');
-            toast.className = `fixed bottom-5 right-5 bg-emerald-600 text-white text-xs px-5 py-3 rounded-2xl flex items-center gap-x-2 shadow-xl z-[200]`;
+            toast.className = `fixed bottom-5 right-5 bg-emerald-600 text-white text-xs px-5 py-3 rounded-2xl flex items-center gap-x-2 shadow-xl z-[200] toast-animate`;
             toast.innerHTML = `<i class="fa-solid fa-check"></i> <span>Logged to your history!</span>`;
             document.body.appendChild(toast);
             
