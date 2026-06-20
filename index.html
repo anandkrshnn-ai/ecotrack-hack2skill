@@ -218,13 +218,13 @@
             </p>
             
             <div class="flex items-center gap-x-4">
-                <button onclick="document.getElementById('calculator').scrollIntoView({ behavior: 'smooth' })" 
+                <button onclick="document.getElementById('calculator').scrollIntoView({ behavior: 'smooth' })" aria-label="Scroll to calculator" 
                         class="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 transition-all text-white font-semibold rounded-3xl flex items-center gap-x-3 text-lg shadow-lg shadow-emerald-900/30">
                     <span>Start Tracking Today</span>
                     <i class="fa-solid fa-arrow-right"></i>
                 </button>
                 
-                <button onclick="loadDemoData()" 
+                <button onclick="loadDemoData()" aria-label="Load demo carbon footprint data" 
                         class="px-6 py-4 border border-zinc-700 hover:bg-zinc-900 transition-all font-semibold rounded-3xl flex items-center gap-x-2 text-lg">
                     <i class="fa-solid fa-play mr-1"></i>
                     <span>Try Demo</span>
@@ -316,22 +316,22 @@
         <div class="mb-5">
             <div class="text-xs font-semibold tracking-wider text-zinc-500 mb-2 px-1">QUICK START PRESETS</div>
             <div class="flex flex-wrap gap-2">
-                <button onclick="applyPreset('chennai-weekday')" 
+                <button onclick="applyPreset('chennai-weekday')" aria-label="Apply typical Chennai weekday preset" 
                         class="preset-btn px-5 py-2 text-sm border border-zinc-700 hover:border-emerald-600 rounded-3xl font-medium flex items-center gap-x-2 active:scale-[0.985]">
                     <i class="fa-solid fa-city text-emerald-400"></i>
                     <span>Typical Chennai Weekday</span>
                 </button>
-                <button onclick="applyPreset('low-impact')" 
+                <button onclick="applyPreset('low-impact')" aria-label="Apply low carbon footprint preset" 
                         class="preset-btn px-5 py-2 text-sm border border-zinc-700 hover:border-emerald-600 rounded-3xl font-medium flex items-center gap-x-2 active:scale-[0.985]">
                     <i class="fa-solid fa-seedling text-emerald-400"></i>
                     <span>Low Impact Day</span>
                 </button>
-                <button onclick="applyPreset('high-impact')" 
+                <button onclick="applyPreset('high-impact')" aria-label="Apply high carbon footprint preset" 
                         class="preset-btn px-5 py-2 text-sm border border-zinc-700 hover:border-emerald-600 rounded-3xl font-medium flex items-center gap-x-2 active:scale-[0.985]">
                     <i class="fa-solid fa-car text-amber-400"></i>
                     <span>High Footprint Day</span>
                 </button>
-                <button onclick="applyPreset('reset')" 
+                <button onclick="applyPreset('reset')" aria-label="Reset calculator inputs" 
                         class="px-4 py-2 text-sm border border-zinc-700 hover:bg-zinc-900 rounded-3xl font-medium text-zinc-400 flex items-center gap-x-1.5">
                     <i class="fa-solid fa-undo text-xs"></i>
                     <span>Reset Form</span>
@@ -482,7 +482,7 @@
             
             <!-- CALCULATE BUTTON -->
             <div class="lg:col-span-12">
-                <button onclick="calculateAndShowResults()" 
+                <button onclick="calculateAndShowResults()" aria-label="Calculate my daily carbon footprint" 
                         class="w-full py-5 text-xl font-semibold bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 transition-all rounded-3xl flex items-center justify-center gap-x-3 shadow-xl shadow-emerald-900/40 text-white">
                     <i class="fa-solid fa-calculator mr-1"></i>
                     <span>CALCULATE MY CARBON FOOTPRINT</span>
@@ -499,7 +499,7 @@
                 <span class="eco-badge">YOUR RESULTS</span>
                 <h2 class="section-header">Today's Footprint</h2>
             </div>
-            <button onclick="hideResults()" class="text-xs px-4 py-2 rounded-2xl border border-zinc-700 hover:bg-zinc-900 flex items-center gap-x-1.5">
+            <button onclick="hideResults()" aria-label="Close calculation results" class="text-xs px-4 py-2 rounded-2xl border border-zinc-700 hover:bg-zinc-900 flex items-center gap-x-1.5">
                 <i class="fa-solid fa-times"></i> <span class="hidden md:inline">Close</span>
             </button>
         </div>
@@ -577,17 +577,17 @@
                 </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-                    <button onclick="applyWhatIf('metro')" 
+                    <button onclick="applyWhatIf('metro')" aria-label="Simulate switching from car to metro" 
                             class="px-4 py-3 border border-zinc-700 hover:border-emerald-600 rounded-2xl text-left transition-all text-xs">
                         <div class="font-medium">Switch car → Metro</div>
                         <div class="text-emerald-400 text-xs mt-0.5">−30–45% transport emissions</div>
                     </button>
-                    <button onclick="applyWhatIf('diet')" 
+                    <button onclick="applyWhatIf('diet')" aria-label="Simulate reducing red meat consumption" 
                             class="px-4 py-3 border border-zinc-700 hover:border-emerald-600 rounded-2xl text-left transition-all text-xs">
                         <div class="font-medium">Reduce red meat 2×/week</div>
                         <div class="text-emerald-400 text-xs mt-0.5">−1.4 to 2.1 kg/day avg</div>
                     </button>
-                    <button onclick="applyWhatIf('energy')" 
+                    <button onclick="applyWhatIf('energy')" aria-label="Simulate reducing AC cooling usage" 
                             class="px-4 py-3 border border-zinc-700 hover:border-emerald-600 rounded-2xl text-left transition-all text-xs">
                         <div class="font-medium">Cut AC use by 2 hrs</div>
                         <div class="text-emerald-400 text-xs mt-0.5">−1.5–2.5 kg on hot days</div>
@@ -614,12 +614,12 @@
                 <h2 class="section-header">History &amp; Trends</h2>
             </div>
             <div class="flex items-center gap-x-2">
-                <button onclick="exportHistory()" 
+                <button onclick="exportHistory()" aria-label="Export carbon footprint history as CSV" 
                         class="text-xs flex items-center gap-x-2 px-4 h-9 border border-zinc-700 hover:bg-zinc-900 rounded-2xl">
                     <i class="fa-solid fa-download text-xs"></i>
                     <span>Export CSV</span>
                 </button>
-                <button onclick="clearHistory()" 
+                <button onclick="clearHistory()" aria-label="Clear all carbon footprint history" 
                         class="text-xs flex items-center gap-x-2 px-4 h-9 border border-red-900/70 hover:bg-red-950 text-red-400 rounded-2xl">
                     <i class="fa-solid fa-trash text-xs"></i>
                     <span>Clear</span>
