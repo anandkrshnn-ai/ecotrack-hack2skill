@@ -1,0 +1,24 @@
+{
+  "name": "ecotrack-hack2skill",
+  "version": "1.0.0",
+  "description": "**Built for Hack2skill Main Challenge 3 — June 2026**",
+  "main": "tailwind.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anandkrshnn-ai/ecotrack-hack2skill.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/anandkrshnn-ai/ecotrack-hack2skill/issues"
+  },
+  "homepage": "https://github.com/anandkrshnn-ai/ecotrack-hack2skill#readme",
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  }
+}
