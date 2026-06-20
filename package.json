@@ -2,23 +2,33 @@
   "name": "ecotrack-hack2skill",
   "version": "1.0.0",
   "description": "**Built for Hack2skill Main Challenge 3 — June 2026**",
-  "main": "tailwind.config.js",
+  "main": "index.html",
   "scripts": {
-    "test": "node tests/calculator.test.js"
+    "test": "jest --coverage",
+    "test:ci": "jest --coverage --ci"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/anandkrshnn-ai/ecotrack-hack2skill.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["carbon-footprint", "sustainability", "ecotrack"],
+  "author": "Anandakrishnan Damodaran",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/anandkrshnn-ai/ecotrack-hack2skill/issues"
   },
-  "homepage": "https://github.com/anandkrshnn-ai/ecotrack-hack2skill#readme",
+  "homepage": "https://anandkrshnn-ai.github.io/ecotrack-hack2skill/",
   "devDependencies": {
+    "jest": "^29.7.0",
     "tailwindcss": "^3.4.19"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "coverageThreshold": {
+      "global": { "lines": 70, "functions": 70, "branches": 60 }
+    }
   }
 }
