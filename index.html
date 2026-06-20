@@ -1,1 +1,1671 @@
-See full polished single-file app in /home/workdir/artifacts/ecotrack-index.html (copy-paste or download and upload to repo)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoTrack • Carbon Footprint Awareness</title>
+    <!-- Production Tailwind CSS (compiled) — clean, no warning -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.17/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
+        
+        :root {
+            --primary: #10b981;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .font-display {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .eco-gradient {
+            background: linear-gradient(135deg, #065f46 0%, #10b981 100%);
+        }
+
+        .section-header {
+            font-size: 1.75rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .card {
+            background-color: #18181b;
+            border: 1px solid #27272a;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        .metric-value {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .nav-active {
+            color: #10b981;
+            border-bottom: 2px solid #10b981;
+        }
+
+        .input-focus {
+            transition: all 0.2s ease;
+        }
+        
+        .input-focus:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+            border-color: #10b981;
+        }
+
+        .eco-leaf {
+            animation: leaf-sway 3s ease infinite;
+        }
+
+        .result-number {
+            font-size: 3.5rem;
+            line-height: 1;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .category-bar {
+            height: 6px;
+            background: linear-gradient(to right, #10b981, #34d399);
+            border-radius: 9999px;
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .tip-card {
+            transition: all 0.2s ease;
+        }
+        
+        .tip-card:hover {
+            transform: translateY(-1px);
+            border-color: #10b981;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .nav-link {
+            transition: color 0.1s ease;
+        }
+        
+        .nav-link:hover {
+            color: #10b981;
+        }
+
+        .glass {
+            background: rgba(24, 24, 27, 0.85);
+            backdrop-filter: blur(12px);
+        }
+
+        .metric-card {
+            background: #18181b;
+            border: 1px solid #27272a;
+        }
+
+        .eco-badge {
+            background: #052e16;
+            color: #4ade80;
+            font-size: 0.75rem;
+            padding: 0.1rem 0.65rem;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+
+        .chart-container {
+            position: relative;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #a1a1aa;
+            margin-bottom: 0.35rem;
+            display: block;
+        }
+
+        .preset-btn {
+            transition: all 0.1s ease;
+        }
+        
+        .preset-btn.active {
+            background-color: #052e16;
+            border-color: #10b981;
+            color: #4ade80;
+        }
+
+        .mini-stat {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        /* Custom styles for arbitrary Tailwind classes since precompiled tailwind.min.css doesn't dynamically resolve brackets */
+        .active\:scale-\[0\.985\]:active { transform: scale(0.985); }
+        .h-\[210px\] { height: 210px; }
+        .py-\[13px\] { padding-top: 13px; padding-bottom: 13px; }
+        .text-\[10px\] { font-size: 10px; }
+        .text-\[15px\] { font-size: 15px; }
+        .tracking-\[1px\] { letter-spacing: 1px; }
+        .z-\[100\] { z-index: 100; }
+        .z-\[200\] { z-index: 200; }
+        .bg-black\/70 { background-color: rgba(0, 0, 0, 0.7); }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200">
+    <!-- NAV -->
+    <nav class="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-lg">
+        <div class="max-w-screen-2xl mx-auto">
+            <div class="px-8 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-x-3">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-x-2.5">
+                        <div class="w-9 h-9 rounded-2xl eco-gradient flex items-center justify-center shadow-inner">
+                            <i class="fa-solid fa-leaf text-white text-3xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-display text-3xl font-semibold tracking-tighter">EcoTrack</span>
+                        </div>
+                    </div>
+                    <div class="hidden md:flex items-center px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-medium">
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse mr-1.5"></div>
+                        <span class="text-emerald-400">Hack2skill 2026</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-x-2 text-sm">
+                    <a href="#calculator" class="nav-link px-4 py-2 rounded-xl hover:bg-zinc-900 font-medium">Calculate</a>
+                    <a href="#trends" class="nav-link px-4 py-2 rounded-xl hover:bg-zinc-900 font-medium">Trends</a>
+                    <a href="#insights" class="nav-link px-4 py-2 rounded-xl hover:bg-zinc-900 font-medium">Insights</a>
+                    
+                    <div class="w-px h-5 bg-zinc-800 mx-1"></div>
+                    
+                    <div onclick="showProfileModal()" class="flex items-center gap-x-2 cursor-pointer hover:bg-zinc-900 px-3 py-1.5 rounded-2xl border border-zinc-800">
+                        <div class="w-7 h-7 bg-emerald-900 rounded-full flex items-center justify-center text-emerald-400 text-xs font-bold">AD</div>
+                        <span id="nav-username" class="font-medium text-sm hidden md:block">Anandakrishnan</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="max-w-screen-2xl mx-auto px-8 pt-12 pb-8">
+        <div class="max-w-3xl">
+            <div class="inline-flex items-center gap-x-2 px-4 py-1.5 rounded-3xl bg-zinc-900 border border-zinc-800 mb-6">
+                <span class="text-emerald-400 text-xs font-semibold tracking-[1px]">MAIN CHALLENGE 3 • CLOSES TONIGHT</span>
+            </div>
+            
+            <h1 class="text-6xl md:text-7xl font-display font-semibold tracking-tighter leading-none mb-4">
+                Know your<br>impact.<br>
+                <span class="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">Reduce it.</span>
+            </h1>
+            
+            <p class="max-w-md text-xl text-zinc-400 mb-8">
+                A beautiful, private web app that tracks your daily carbon footprint and gives you clear, personalized actions to live lighter on the planet.
+            </p>
+            
+            <div class="flex items-center gap-x-4">
+                <button onclick="document.getElementById('calculator').scrollIntoView({ behavior: 'smooth' })" 
+                        class="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 transition-all text-white font-semibold rounded-3xl flex items-center gap-x-3 text-lg shadow-lg shadow-emerald-900/30">
+                    <span>Start Tracking Today</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+                
+                <button onclick="loadDemoData()" 
+                        class="px-6 py-4 border border-zinc-700 hover:bg-zinc-900 transition-all font-semibold rounded-3xl flex items-center gap-x-2 text-lg">
+                    <i class="fa-solid fa-play mr-1"></i>
+                    <span>Try Demo</span>
+                </button>
+            </div>
+            
+            <div class="flex items-center gap-x-6 mt-8 text-sm text-zinc-500">
+                <div class="flex items-center gap-x-1.5">
+                    <i class="fa-solid fa-check text-emerald-400"></i>
+                    <span>100% private • browser only</span>
+                </div>
+                <div class="flex items-center gap-x-1.5">
+                    <i class="fa-solid fa-check text-emerald-400"></i>
+                    <span>India-focused insights</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS BAR -->
+    <div class="border-y border-zinc-800 bg-zinc-900/50">
+        <div class="max-w-screen-2xl mx-auto px-8 py-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div>
+                    <div class="text-emerald-400 text-2xl font-semibold">5.2 kg</div>
+                    <div class="text-xs text-zinc-500">Avg Indian daily footprint</div>
+                </div>
+                <div>
+                    <div class="text-emerald-400 text-2xl font-semibold">~1.9 t</div>
+                    <div class="text-xs text-zinc-500">India per capita / year</div>
+                </div>
+                <div>
+                    <div class="text-emerald-400 text-2xl font-semibold">3×</div>
+                    <div class="text-xs text-zinc-500">Potential reduction with simple changes</div>
+                </div>
+                <div>
+                    <div class="text-emerald-400 text-2xl font-semibold">24h</div>
+                    <div class="text-xs text-zinc-500">Built for this challenge</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="max-w-screen-2xl mx-auto px-8 pt-12 pb-6">
+        <div class="text-center mb-8">
+            <span class="eco-badge">HOW IT WORKS</span>
+            <h2 class="section-header mt-3">Three simple steps to awareness</h2>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            <div class="card p-6 rounded-3xl">
+                <div class="w-9 h-9 flex items-center justify-center bg-emerald-900/60 text-emerald-400 rounded-2xl mb-4">
+                    <i class="fa-solid fa-edit text-xl"></i>
+                </div>
+                <div class="font-semibold text-xl mb-1.5">1. Log your day</div>
+                <p class="text-zinc-400 text-[15px]">Quickly enter how you traveled, energy used at home, what you ate, and consumption level. Use smart presets for speed.</p>
+            </div>
+            <div class="card p-6 rounded-3xl">
+                <div class="w-9 h-9 flex items-center justify-center bg-emerald-900/60 text-emerald-400 rounded-2xl mb-4">
+                    <i class="fa-solid fa-chart-pie text-xl"></i>
+                </div>
+                <div class="font-semibold text-xl mb-1.5">2. See your impact</div>
+                <p class="text-zinc-400 text-[15px]">Get instant total in kgCO₂e with beautiful breakdown charts, comparison to average, and your personal eco-score.</p>
+            </div>
+            <div class="card p-6 rounded-3xl">
+                <div class="w-9 h-9 flex items-center justify-center bg-emerald-900/60 text-emerald-400 rounded-2xl mb-4">
+                    <i class="fa-solid fa-lightbulb text-xl"></i>
+                </div>
+                <div class="font-semibold text-xl mb-1.5">3. Take action</div>
+                <p class="text-zinc-400 text-[15px]">Receive tailored recommendations with estimated savings. Test "what if" changes. Log daily to see your trend improve.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CALCULATOR SECTION -->
+    <div id="calculator" class="max-w-screen-2xl mx-auto px-8 pt-8 pb-16 scroll-mt-16">
+        <div class="flex items-end justify-between mb-6">
+            <div>
+                <span class="eco-badge">TODAY'S LOG</span>
+                <h2 class="section-header mt-1">Calculate your daily footprint</h2>
+            </div>
+            <div class="hidden md:block text-xs px-3 py-1 bg-zinc-900 border border-zinc-700 rounded-2xl text-zinc-400">
+                Data stays in <span class="text-emerald-400">your browser</span>
+            </div>
+        </div>
+
+        <!-- PRESETS -->
+        <div class="mb-5">
+            <div class="text-xs font-semibold tracking-wider text-zinc-500 mb-2 px-1">QUICK START PRESETS</div>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="applyPreset('chennai-weekday')" 
+                        class="preset-btn px-5 py-2 text-sm border border-zinc-700 hover:border-emerald-600 rounded-3xl font-medium flex items-center gap-x-2 active:scale-[0.985]">
+                    <i class="fa-solid fa-city text-emerald-400"></i>
+                    <span>Typical Chennai Weekday</span>
+                </button>
+                <button onclick="applyPreset('low-impact')" 
+                        class="preset-btn px-5 py-2 text-sm border border-zinc-700 hover:border-emerald-600 rounded-3xl font-medium flex items-center gap-x-2 active:scale-[0.985]">
+                    <i class="fa-solid fa-seedling text-emerald-400"></i>
+                    <span>Low Impact Day</span>
+                </button>
+                <button onclick="applyPreset('high-impact')" 
+                        class="preset-btn px-5 py-2 text-sm border border-zinc-700 hover:border-emerald-600 rounded-3xl font-medium flex items-center gap-x-2 active:scale-[0.985]">
+                    <i class="fa-solid fa-car text-amber-400"></i>
+                    <span>High Footprint Day</span>
+                </button>
+                <button onclick="applyPreset('reset')" 
+                        class="px-4 py-2 text-sm border border-zinc-700 hover:bg-zinc-900 rounded-3xl font-medium text-zinc-400 flex items-center gap-x-1.5">
+                    <i class="fa-solid fa-undo text-xs"></i>
+                    <span>Reset Form</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- MOBILITY -->
+            <div class="lg:col-span-5 card p-6 rounded-3xl">
+                <div class="flex items-center gap-x-3 mb-5">
+                    <div class="w-8 h-8 bg-emerald-900/70 text-emerald-400 flex-shrink-0 rounded-2xl flex items-center justify-center">
+                        <i class="fa-solid fa-car-side fa-fw"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-xl">Mobility</div>
+                        <div class="text-xs text-zinc-500">Today's travel • km</div>
+                    </div>
+                </div>
+                
+                <div class="space-y-5">
+                    <!-- Two-wheeler / Car -->
+                    <div>
+                        <div class="flex justify-between items-baseline mb-1.5">
+                            <label class="form-label">Two-wheeler or Car (km)</label>
+                            <span id="car-km-value" class="text-xs font-mono text-emerald-400">18</span>
+                        </div>
+                        <div class="flex gap-3 items-center">
+                            <input type="range" id="car-km" min="0" max="80" step="1" value="18" 
+                                   class="flex-1 accent-emerald-500" oninput="updateSliderValue('car-km')">
+                            <input type="number" id="car-km-num" value="18" step="1"
+                                   class="w-20 bg-zinc-900 border border-zinc-700 rounded-2xl px-3 py-1.5 text-sm input-focus" 
+                                   onchange="syncSlider('car-km')">
+                        </div>
+                        
+                        <div class="mt-2.5">
+                            <select id="car-type" class="w-full bg-zinc-900 border border-zinc-700 text-sm rounded-2xl px-4 py-2.5 input-focus">
+                                <option value="two_wheeler">Two-wheeler (Petrol) — 0.09 kg/km</option>
+                                <option value="car_petrol" selected>Car (Petrol) — 0.16 kg/km</option>
+                                <option value="car_diesel">Car (Diesel) — 0.14 kg/km</option>
+                                <option value="car_ev">EV / Hybrid — 0.06 kg/km</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Public Transport -->
+                    <div>
+                        <div class="flex justify-between items-baseline mb-1.5">
+                            <label class="form-label">Bus / Metro / Train (km)</label>
+                            <span id="public-km-value" class="text-xs font-mono text-emerald-400">12</span>
+                        </div>
+                        <div class="flex gap-3 items-center">
+                            <input type="range" id="public-km" min="0" max="60" step="1" value="12" 
+                                   class="flex-1 accent-emerald-500" oninput="updateSliderValue('public-km')">
+                            <input type="number" id="public-km-num" value="12" step="1"
+                                   class="w-20 bg-zinc-900 border border-zinc-700 rounded-2xl px-3 py-1.5 text-sm input-focus" 
+                                   onchange="syncSlider('public-km')">
+                        </div>
+                        <div class="text-[10px] text-zinc-500 mt-1 px-1">Chennai Metro + MTC buses • ~0.05 kgCO₂e per km</div>
+                    </div>
+                    
+                    <div class="pt-1">
+                        <label class="form-label flex items-center gap-x-2">Flights or long-distance today?</label>
+                        <div class="flex gap-2">
+                            <select id="flight" class="flex-1 bg-zinc-900 border border-zinc-700 text-sm rounded-2xl px-4 py-2 input-focus">
+                                <option value="0">None</option>
+                                <option value="short">Short domestic flight (~250 km) — +2.8 kg</option>
+                                <option value="medium">Medium flight (~800 km) — +6.5 kg</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ENERGY + FOOD -->
+            <div class="lg:col-span-4 card p-6 rounded-3xl space-y-6">
+                <!-- Energy -->
+                <div>
+                    <div class="flex items-center gap-x-3 mb-4">
+                        <div class="w-8 h-8 bg-amber-900/60 text-amber-400 flex-shrink-0 rounded-2xl flex items-center justify-center">
+                            <i class="fa-solid fa-bolt-lightning fa-fw"></i>
+                        </div>
+                        <div class="font-semibold text-xl">Home Energy</div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between mb-1.5">
+                            <label class="form-label">Electricity used today (kWh)</label>
+                            <span id="elec-value" class="text-xs font-mono text-emerald-400">9.5</span>
+                        </div>
+                        <div class="flex gap-3 items-center">
+                            <input type="range" id="electricity" min="2" max="25" step="0.5" value="9.5" 
+                                   class="flex-1 accent-emerald-500" oninput="updateSliderValue('electricity')">
+                            <input type="number" id="electricity-num" value="9.5" step="0.5"
+                                   class="w-20 bg-zinc-900 border border-zinc-700 rounded-2xl px-3 py-1.5 text-sm input-focus" 
+                                   onchange="syncSlider('electricity')">
+                        </div>
+                        <div class="text-[10px] text-zinc-500 mt-1">Tamil Nadu grid factor ~0.78 kgCO₂e/kWh. Typical home 6–12 kWh.</div>
+                    </div>
+                </div>
+                
+                <!-- Food -->
+                <div>
+                    <div class="flex items-center gap-x-3 mb-4">
+                        <div class="w-8 h-8 bg-orange-900/60 text-orange-400 flex-shrink-0 rounded-2xl flex items-center justify-center">
+                            <i class="fa-solid fa-utensils fa-fw"></i>
+                        </div>
+                        <div class="font-semibold text-xl">Diet Today</div>
+                    </div>
+                    
+                    <select id="diet-type" class="w-full bg-zinc-900 border border-zinc-700 text-sm rounded-2xl px-4 py-[13px] input-focus">
+                        <option value="vegan">🌱 Mostly plant-based / Vegan — 1.8 kg</option>
+                        <option value="vegetarian">🥬 Vegetarian (dairy + eggs) — 2.6 kg</option>
+                        <option value="mixed" selected>Mixed diet (some chicken/fish) — 3.9 kg</option>
+                        <option value="high_meat">🥩 High red meat — 5.8 kg</option>
+                    </select>
+                    <div class="text-[10px] text-zinc-500 mt-1.5 px-1">Food-related emissions only (production + transport). Based on lifecycle studies.</div>
+                </div>
+            </div>
+            
+            <!-- OTHER + ACTIONS -->
+            <div class="lg:col-span-3 card p-6 rounded-3xl flex flex-col">
+                <div>
+                    <div class="flex items-center gap-x-3 mb-4">
+                        <div class="w-8 h-8 bg-sky-900/60 text-sky-400 flex-shrink-0 rounded-2xl flex items-center justify-center">
+                            <i class="fa-solid fa-shopping-bag fa-fw"></i>
+                        </div>
+                        <div class="font-semibold text-xl">Consumption &amp; Waste</div>
+                    </div>
+                    
+                    <div class="mb-5">
+                        <label class="form-label">Today's lifestyle impact</label>
+                        <select id="consumption" class="w-full bg-zinc-900 border border-zinc-700 text-sm rounded-2xl px-4 py-[13px] input-focus">
+                            <option value="low">Low — minimal new purchases, good segregation</option>
+                            <option value="medium" selected>Medium — normal shopping + waste</option>
+                            <option value="high">High — new clothes/gadgets + high waste</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mt-auto pt-4 border-t border-zinc-800">
+                        <div class="text-xs text-zinc-400 mb-3">Optional reflection</div>
+                        <textarea id="notes" rows="2" placeholder="Any special activity today? (e.g. weekend trip, festival cooking...)" 
+                                  class="w-full text-sm bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-3 text-xs input-focus resize-y"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CALCULATE BUTTON -->
+            <div class="lg:col-span-12">
+                <button onclick="calculateAndShowResults()" 
+                        class="w-full py-5 text-xl font-semibold bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 transition-all rounded-3xl flex items-center justify-center gap-x-3 shadow-xl shadow-emerald-900/40 text-white">
+                    <i class="fa-solid fa-calculator mr-1"></i>
+                    <span>CALCULATE MY CARBON FOOTPRINT</span>
+                </button>
+                <div class="text-center text-[10px] text-zinc-500 mt-2">Takes less than 30 seconds • All calculations happen in your browser</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESULTS SECTION -->
+    <div id="results-section" class="hidden max-w-screen-2xl mx-auto px-8 pb-16 scroll-mt-8">
+        <div class="flex items-center justify-between mb-5 px-1">
+            <div>
+                <span class="eco-badge">YOUR RESULTS</span>
+                <h2 class="section-header">Today's Footprint</h2>
+            </div>
+            <button onclick="hideResults()" class="text-xs px-4 py-2 rounded-2xl border border-zinc-700 hover:bg-zinc-900 flex items-center gap-x-1.5">
+                <i class="fa-solid fa-times"></i> <span class="hidden md:inline">Close</span>
+            </button>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- BIG NUMBER -->
+            <div class="lg:col-span-5 card p-8 rounded-3xl flex flex-col justify-between">
+                <div>
+                    <div class="text-emerald-400 text-sm font-semibold tracking-widest">ESTIMATED DAILY EMISSIONS</div>
+                    <div id="total-value" class="result-number text-white mt-1">0.0</div>
+                    <div class="text-2xl font-medium text-zinc-400 -mt-1">kg CO₂e</div>
+                </div>
+                
+                <div class="mt-6">
+                    <div id="comparison-text" class="text-sm"></div>
+                    
+                    <div class="flex items-center gap-x-2 mt-3">
+                        <div id="eco-score-badge" 
+                             class="inline-flex items-center px-4 h-8 rounded-2xl text-sm font-bold"></div>
+                        <div onclick="logCurrentToHistory()" 
+                             class="cursor-pointer flex items-center text-xs px-4 h-8 border border-emerald-600 hover:bg-emerald-900/40 text-emerald-400 rounded-2xl font-medium transition-colors">
+                            <i class="fa-solid fa-save mr-2 text-xs"></i> 
+                            <span>LOG TO HISTORY</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- BREAKDOWN -->
+            <div class="lg:col-span-7 card p-6 rounded-3xl">
+                <div class="font-semibold mb-4 flex items-center justify-between">
+                    <span>Breakdown by Category</span>
+                    <span class="text-xs text-zinc-500">kg CO₂e</span>
+                </div>
+                
+                <div class="space-y-4" id="breakdown-list">
+                    <!-- Populated by JS -->
+                </div>
+                
+                <div class="mt-6 pt-4 border-t border-zinc-800 grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-xs text-zinc-500 mb-1">Transport</div>
+                        <div class="flex items-center gap-x-2">
+                            <div class="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
+                                <div id="bar-transport" class="h-2 bg-emerald-400 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <span id="val-transport" class="font-mono text-sm w-10 text-right">0</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-zinc-500 mb-1">Energy</div>
+                        <div class="flex items-center gap-x-2">
+                            <div class="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
+                                <div id="bar-energy" class="h-2 bg-amber-400 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <span id="val-energy" class="font-mono text-sm w-10 text-right">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CHARTS -->
+            <div class="lg:col-span-5 card p-6 rounded-3xl">
+                <div class="font-semibold mb-3">Category Share</div>
+                <div class="chart-container h-[210px]">
+                    <canvas id="pie-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="lg:col-span-7 card p-6 rounded-3xl">
+                <div class="font-semibold mb-3 flex items-center justify-between">
+                    <span>What-If Simulator</span>
+                    <span class="text-[10px] text-emerald-400">See impact of changes</span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                    <button onclick="applyWhatIf('metro')" 
+                            class="px-4 py-3 border border-zinc-700 hover:border-emerald-600 rounded-2xl text-left transition-all text-xs">
+                        <div class="font-medium">Switch car → Metro</div>
+                        <div class="text-emerald-400 text-xs mt-0.5">−30–45% transport emissions</div>
+                    </button>
+                    <button onclick="applyWhatIf('diet')" 
+                            class="px-4 py-3 border border-zinc-700 hover:border-emerald-600 rounded-2xl text-left transition-all text-xs">
+                        <div class="font-medium">Reduce red meat 2×/week</div>
+                        <div class="text-emerald-400 text-xs mt-0.5">−1.4 to 2.1 kg/day avg</div>
+                    </button>
+                    <button onclick="applyWhatIf('energy')" 
+                            class="px-4 py-3 border border-zinc-700 hover:border-emerald-600 rounded-2xl text-left transition-all text-xs">
+                        <div class="font-medium">Cut AC use by 2 hrs</div>
+                        <div class="text-emerald-400 text-xs mt-0.5">−1.5–2.5 kg on hot days</div>
+                    </button>
+                </div>
+                
+                <div id="whatif-result" class="hidden mt-4 p-3 bg-zinc-900 border border-emerald-800 rounded-2xl text-xs flex items-center justify-between">
+                    <div>
+                        <span class="font-medium">New hypothetical total:</span> 
+                        <span id="whatif-total" class="font-mono font-semibold text-emerald-400"></span> kg
+                    </div>
+                    <div onclick="resetWhatIf()" class="cursor-pointer text-emerald-400 hover:text-white text-xs">Reset</div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- TRENDS / HISTORY -->
+    <div id="trends" class="max-w-screen-2xl mx-auto px-8 py-10 border-t border-zinc-800 scroll-mt-16">
+        <div class="flex items-end justify-between mb-6">
+            <div>
+                <span class="eco-badge">YOUR JOURNEY</span>
+                <h2 class="section-header">History &amp; Trends</h2>
+            </div>
+            <div class="flex items-center gap-x-2">
+                <button onclick="exportHistory()" 
+                        class="text-xs flex items-center gap-x-2 px-4 h-9 border border-zinc-700 hover:bg-zinc-900 rounded-2xl">
+                    <i class="fa-solid fa-download text-xs"></i>
+                    <span>Export CSV</span>
+                </button>
+                <button onclick="clearHistory()" 
+                        class="text-xs flex items-center gap-x-2 px-4 h-9 border border-red-900/70 hover:bg-red-950 text-red-400 rounded-2xl">
+                    <i class="fa-solid fa-trash text-xs"></i>
+                    <span>Clear</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Stats -->
+            <div class="lg:col-span-3 space-y-3">
+                <div class="card p-5 rounded-3xl">
+                    <div class="text-xs text-zinc-400">CURRENT STREAK</div>
+                    <div id="streak-value" class="stat-value text-emerald-400 mt-1">—</div>
+                    <div class="text-xs">consecutive days logged</div>
+                </div>
+                <div class="card p-5 rounded-3xl">
+                    <div class="text-xs text-zinc-400">7-DAY AVERAGE</div>
+                    <div id="avg-7day" class="stat-value text-white mt-1">—</div>
+                    <div class="text-xs">kg CO₂e / day</div>
+                </div>
+                <div class="card p-5 rounded-3xl">
+                    <div class="text-xs text-zinc-400">TOTAL ENTRIES</div>
+                    <div id="total-entries" class="stat-value text-white mt-1">0</div>
+                </div>
+            </div>
+            
+            <!-- Chart -->
+            <div class="lg:col-span-9 card p-6 rounded-3xl">
+                <div class="font-semibold mb-4">Daily Trend</div>
+                <div class="h-[210px]">
+                    <canvas id="trend-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Table -->
+            <div class="lg:col-span-12 card p-1 rounded-3xl overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-zinc-800 text-xs text-zinc-400">
+                            <th class="text-left px-5 py-3 font-normal">Date</th>
+                            <th class="text-right px-5 py-3 font-normal">Total (kg)</th>
+                            <th class="text-right px-4 py-3 font-normal hidden md:table-cell">Transport</th>
+                            <th class="text-right px-4 py-3 font-normal hidden md:table-cell">Energy</th>
+                            <th class="text-right px-4 py-3 font-normal hidden md:table-cell">Food</th>
+                            <th class="text-right px-4 py-3 font-normal hidden md:table-cell">Other</th>
+                            <th class="w-10"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table-body" class="divide-y divide-zinc-800 text-sm">
+                        <!-- JS populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- INSIGHTS SECTION -->
+    <div id="insights" class="max-w-screen-2xl mx-auto px-8 py-10 border-t border-zinc-800 scroll-mt-16 bg-zinc-900/30">
+        <div class="max-w-4xl">
+            <span class="eco-badge">ACTIONABLE INSIGHTS</span>
+            <h2 class="section-header mt-2 mb-2">Personalized tips to reduce your footprint</h2>
+            <p class="text-zinc-400">Recommendations are generated based on your biggest emission categories. Small consistent changes compound fast.</p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8" id="insights-list">
+            <!-- Populated dynamically or static good defaults -->
+        </div>
+        
+        <div class="mt-8 p-5 border border-zinc-800 rounded-3xl text-xs text-zinc-400 max-w-3xl">
+            <strong class="text-emerald-400">Chennai / Tamil Nadu specific:</strong> Use Chennai Metro (CMRL) and MTC buses — among the lowest emission options per km in India. 
+            Consider shifting AC usage to off-peak solar hours. Local millets, lentils and seasonal vegetables have significantly lower embodied carbon than imported or processed foods.
+        </div>
+    </div>
+
+    <!-- FOOTER / ABOUT -->
+    <footer class="border-t border-zinc-800 bg-zinc-950">
+        <div class="max-w-screen-2xl mx-auto px-8 py-10 text-xs text-zinc-500">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-y-4">
+                <div>
+                    Built with ❤️ for <span class="text-emerald-400">Hack2skill Main Challenge 3</span> • June 2026<br>
+                    <span class="font-mono text-[10px]">Privacy-first • No accounts • Data stays on your device</span>
+                </div>
+                <div class="flex flex-wrap gap-x-5 gap-y-1">
+                    <a href="#" onclick="showSourcesModal()" class="hover:text-emerald-400 transition-colors">Data Sources &amp; Methodology</a>
+                    <span class="hidden md:inline">•</span>
+                    <span>Built by Anandakrishnan Damodaran</span>
+                </div>
+            </div>
+            
+            <div class="mt-6 text-[10px] max-w-3xl">
+                Estimates are for awareness and education purposes only. Actual emissions vary based on vehicle efficiency, exact diet composition, grid mix at time of use, and many other factors. 
+                This is not a substitute for professional carbon accounting or regulatory reporting.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Profile Modal -->
+    <div id="profile-modal" onclick="if (event.target.id === 'profile-modal') hideProfileModal()" class="hidden fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-6">
+        <div onclick="event.stopImmediatePropagation()" class="card w-full max-w-md rounded-3xl p-7">
+            <div class="flex justify-between mb-5">
+                <div class="font-semibold text-xl">Your Profile</div>
+                <button onclick="hideProfileModal()" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-times fa-lg"></i></button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-zinc-400">Display Name</label>
+                    <input id="profile-name" type="text" value="Anandakrishnan" 
+                           class="mt-1 w-full bg-zinc-900 border border-zinc-700 px-4 py-2.5 rounded-2xl input-focus">
+                </div>
+                <div class="text-xs text-zinc-400">Your data is stored only in this browser (localStorage). Clearing browser data will reset history.</div>
+            </div>
+            
+            <div class="flex gap-3 mt-6">
+                <button onclick="saveProfile()" class="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-2xl font-semibold text-sm">Save</button>
+                <button onclick="hideProfileModal()" class="flex-1 py-3 border border-zinc-700 rounded-2xl font-semibold text-sm">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sources Modal -->
+    <div id="sources-modal" onclick="if (event.target.id === 'sources-modal') hideSourcesModal()" class="hidden fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-6">
+        <div onclick="event.stopImmediatePropagation()" class="card w-full max-w-2xl rounded-3xl p-8 text-sm">
+            <div class="flex justify-between items-start mb-5">
+                <div>
+                    <div class="font-semibold text-2xl">Data Sources &amp; Methodology</div>
+                    <div class="text-emerald-400 text-xs">Transparent • Verifiable</div>
+                </div>
+                <button onclick="hideSourcesModal()" class="text-xl leading-none text-zinc-400 hover:text-white">×</button>
+            </div>
+            
+            <div class="prose prose-invert text-xs max-w-none text-zinc-300 space-y-4">
+                <div>
+                    <strong>Transportation factors</strong> (kgCO₂e per passenger-km):<br>
+                    • Two-wheeler / Car petrol: 0.09–0.16 (adapted from Our World in Data + India GHG Programme)<br>
+                    • Public bus / metro: ~0.05 (lower due to occupancy)<br>
+                    • Domestic flights: 0.20–0.25 (short-haul higher per km)
+                </div>
+                <div>
+                    <strong>Electricity:</strong> ~0.78 kgCO₂e/kWh (India average grid mix, 2024–2025 data. Tamil Nadu slightly lower with renewables).
+                </div>
+                <div>
+                    <strong>Food:</strong> Aggregated from Poore &amp; Nemecek (Science 2018), FAO, and Indian diet studies. Values represent production + supply chain emissions attributable to daily consumption.
+                </div>
+                <div class="text-[10px] text-zinc-400 pt-2 border-t border-zinc-700">
+                    Full references available in source code. This calculator prioritizes speed and education over precision. For corporate or regulatory use, use GHG Protocol + verified data.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tailwind script
+        function initTailwind() {
+            document.documentElement.style.setProperty('--accent', '#10b981');
+            
+            if (typeof tailwind !== 'undefined') {
+                tailwind.config = {
+                    theme: {
+                        extend: {
+                            fontFamily: {
+                                'display': ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif']
+                            }
+                        }
+                    }
+                };
+            }
+        }
+        
+        // Emission Factors (kgCO2e)
+        const FACTORS = {
+            transport: {
+                two_wheeler: 0.09,
+                car_petrol: 0.16,
+                car_diesel: 0.14,
+                car_ev: 0.06
+            },
+            public_transport: 0.05,
+            electricity: 0.78,        // India approx
+            food: {
+                vegan: 1.8,
+                vegetarian: 2.6,
+                mixed: 3.9,
+                high_meat: 5.8
+            },
+            consumption: {
+                low: 0.6,
+                medium: 1.3,
+                high: 2.4
+            },
+            flight_short: 2.8,
+            flight_medium: 6.5
+        };
+        
+        let pieChartInstance = null;
+        let trendChartInstance = null;
+        let currentResults = null;
+        
+        function updateSliderValue(id) {
+            const slider = document.getElementById(id);
+            const numInput = document.getElementById(id + '-num');
+            const valueEl = document.getElementById(id + '-value');
+            
+            if (numInput) numInput.value = slider.value;
+            if (valueEl) valueEl.textContent = parseFloat(slider.value).toFixed(id === 'electricity' ? 1 : 0);
+        }
+        
+        function syncSlider(id) {
+            const numInput = document.getElementById(id + '-num');
+            const slider = document.getElementById(id);
+            const valueEl = document.getElementById(id + '-value');
+            
+            if (!numInput || !slider) return;
+            
+            let val = parseFloat(numInput.value);
+            if (isNaN(val)) val = 0;
+            
+            const min = parseFloat(slider.min);
+            const max = parseFloat(slider.max);
+            val = Math.max(min, Math.min(max, val));
+            
+            slider.value = val;
+            numInput.value = val;
+            if (valueEl) valueEl.textContent = val.toFixed(id === 'electricity' ? 1 : 0);
+        }
+        
+        function applyPreset(type) {
+            // Deselect all preset buttons visually
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active', 'border-emerald-600'));
+            
+            const carKm = document.getElementById('car-km');
+            const carKmNum = document.getElementById('car-km-num');
+            const publicKm = document.getElementById('public-km');
+            const publicKmNum = document.getElementById('public-km-num');
+            const carType = document.getElementById('car-type');
+            const electricity = document.getElementById('electricity');
+            const electricityNum = document.getElementById('electricity-num');
+            const diet = document.getElementById('diet-type');
+            const consumption = document.getElementById('consumption');
+            
+            if (type === 'reset') {
+                carKm.value = 0; carKmNum.value = 0;
+                publicKm.value = 0; publicKmNum.value = 0;
+                electricity.value = 6; electricityNum.value = 6;
+                diet.value = 'mixed';
+                consumption.value = 'medium';
+                document.getElementById('flight').value = '0';
+                document.getElementById('notes').value = '';
+                updateAllSliders();
+                return;
+            }
+            
+            if (type === 'chennai-weekday') {
+                carKm.value = 22; carKmNum.value = 22;
+                publicKm.value = 14; publicKmNum.value = 14;
+                carType.value = 'two_wheeler';
+                electricity.value = 10.5; electricityNum.value = 10.5;
+                diet.value = 'mixed';
+                consumption.value = 'medium';
+                document.getElementById('flight').value = '0';
+            } 
+            else if (type === 'low-impact') {
+                carKm.value = 4; carKmNum.value = 4;
+                publicKm.value = 18; publicKmNum.value = 18;
+                carType.value = 'car_ev';
+                electricity.value = 5.5; electricityNum.value = 5.5;
+                diet.value = 'vegan';
+                consumption.value = 'low';
+                document.getElementById('flight').value = '0';
+            } 
+            else if (type === 'high-impact') {
+                carKm.value = 45; carKmNum.value = 45;
+                publicKm.value = 5; publicKmNum.value = 5;
+                carType.value = 'car_petrol';
+                electricity.value = 16; electricityNum.value = 16;
+                diet.value = 'high_meat';
+                consumption.value = 'high';
+                document.getElementById('flight').value = '0';
+            }
+            
+            updateAllSliders();
+            
+            // Highlight active preset
+            const activeBtn = Array.from(document.querySelectorAll('.preset-btn')).find(b => b.textContent.toLowerCase().includes(type.split('-')[0]));
+            if (activeBtn) activeBtn.classList.add('active', 'border-emerald-600');
+        }
+        
+        function updateAllSliders() {
+            ['car-km', 'public-km', 'electricity'].forEach(id => {
+                const slider = document.getElementById(id);
+                const num = document.getElementById(id + '-num');
+                const valEl = document.getElementById(id + '-value');
+                if (slider && num) {
+                    num.value = slider.value;
+                    if (valEl) valEl.textContent = parseFloat(slider.value).toFixed(id === 'electricity' ? 1 : 0);
+                }
+            });
+        }
+        
+        function calculateFootprint() {
+            const carKm = parseFloat(document.getElementById('car-km').value) || 0;
+            const publicKm = parseFloat(document.getElementById('public-km').value) || 0;
+            const carType = document.getElementById('car-type').value;
+            const electricityKwh = parseFloat(document.getElementById('electricity').value) || 0;
+            const dietType = document.getElementById('diet-type').value;
+            const consumptionLevel = document.getElementById('consumption').value;
+            const flight = document.getElementById('flight').value;
+            
+            let transport = 0;
+            
+            // Car / Two-wheeler
+            const carFactor = FACTORS.transport[carType] || 0.15;
+            transport += carKm * carFactor;
+            
+            // Public
+            transport += publicKm * FACTORS.public_transport;
+            
+            // Flight
+            if (flight === 'short') transport += FACTORS.flight_short;
+            if (flight === 'medium') transport += FACTORS.flight_medium;
+            
+            const energy = electricityKwh * FACTORS.electricity;
+            const food = FACTORS.food[dietType] || 3.5;
+            const other = FACTORS.consumption[consumptionLevel] || 1.3;
+            
+            const total = transport + energy + food + other;
+            
+            return {
+                total: parseFloat(total.toFixed(2)),
+                breakdown: {
+                    transport: parseFloat(transport.toFixed(2)),
+                    energy: parseFloat(energy.toFixed(2)),
+                    food: parseFloat(food.toFixed(2)),
+                    other: parseFloat(other.toFixed(2))
+                },
+                inputs: {
+                    carKm, publicKm, carType, electricityKwh, dietType, consumptionLevel, flight
+                }
+            };
+        }
+        
+        function getEcoScore(total) {
+            // Simple scoring: lower is better. Max score 95 for very low footprint
+            if (total <= 3.0) return { score: 92, label: "Excellent", color: "emerald" };
+            if (total <= 4.5) return { score: 78, label: "Very Good", color: "emerald" };
+            if (total <= 6.5) return { score: 62, label: "Good", color: "teal" };
+            if (total <= 9.0) return { score: 45, label: "Average", color: "amber" };
+            return { score: 28, label: "High Impact", color: "rose" };
+        }
+        
+        function generateRecommendations(breakdown, total) {
+            const recs = [];
+            const transportPct = (breakdown.transport / total) * 100;
+            const foodPct = (breakdown.food / total) * 100;
+            const energyPct = (breakdown.energy / total) * 100;
+            
+            if (transportPct > 38) {
+                recs.push({
+                    icon: "fa-car-side",
+                    title: "Mobility is your top lever",
+                    text: "Try replacing 40% of two-wheeler/car trips with Chennai Metro or MTC. Potential daily saving: " + (breakdown.transport * 0.38).toFixed(1) + " kg",
+                    impact: "High"
+                });
+            }
+            
+            if (foodPct > 42 || breakdown.food > 4.2) {
+                recs.push({
+                    icon: "fa-utensils",
+                    title: "Shift 2–3 meals to plant-forward",
+                    text: "Reducing red meat and increasing lentils/millets can cut food emissions by 30–45%. Easy win in Indian diets.",
+                    impact: "High"
+                });
+            }
+            
+            if (energyPct > 28 && breakdown.energy > 3) {
+                recs.push({
+                    icon: "fa-bolt-lightning",
+                    title: "Optimize cooling & appliances",
+                    text: "Run AC 1–2 hrs less or at 26–27°C. Shift heavy loads to daytime solar hours. Saves ~1.2–2 kg on typical days.",
+                    impact: "Medium"
+                });
+            }
+            
+            if (total < 4.2) {
+                recs.push({
+                    icon: "fa-tachometer-alt",
+                    title: "You're already doing great!",
+                    text: "Your footprint is well below the Indian average. Share your habits — inspire friends and family.",
+                    impact: "Inspire"
+                });
+            } else if (total > 8) {
+                recs.push({
+                    icon: "fa-exclamation-triangle",
+                    title: "High impact day — focus on 1 change",
+                    text: "Pick the single biggest category above and improve it consistently for 7 days. Small wins build momentum.",
+                    impact: "Action"
+                });
+            }
+            
+            // Always add one general
+            if (recs.length < 3) {
+                recs.push({
+                    icon: "fa-recycle",
+                    title: "Segregate & reduce waste",
+                    text: "Composting kitchen waste and avoiding single-use plastics reduces methane and embodied emissions significantly over time.",
+                    impact: "Medium"
+                });
+            }
+            
+            return recs.slice(0, 4);
+        }
+        
+        function renderBreakdown(breakdown, total) {
+            const container = document.getElementById('breakdown-list');
+            container.innerHTML = '';
+            
+            const categories = [
+                { key: 'transport', label: 'Transport', color: 'emerald', icon: 'fa-car-side' },
+                { key: 'energy', label: 'Home Energy', color: 'amber', icon: 'fa-bolt-lightning' },
+                { key: 'food', label: 'Food & Diet', color: 'orange', icon: 'fa-utensils' },
+                { key: 'other', label: 'Consumption & Waste', color: 'sky', icon: 'fa-shopping-bag' }
+            ];
+            
+            categories.forEach(cat => {
+                const val = breakdown[cat.key];
+                const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between text-sm';
+                div.innerHTML = `
+                     <div class="flex items-center gap-x-2.5 w-2/5">
+                        <i class="fa-solid ${cat.icon} text-${cat.color}-400 w-4"></i>
+                        <span class="font-medium">${cat.label}</span>
+                    </div>
+                    <div class="flex-1 mx-3">
+                        <div class="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                            <div class="h-1.5 bg-${cat.color}-400 rounded-full transition-all" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                    <div class="font-mono w-16 text-right tabular-nums">
+                        <span class="font-semibold">${val}</span>
+                        <span class="text-xs text-zinc-500">kg</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            
+            // Update bar visuals in results header area
+            const barTransport = document.getElementById('bar-transport');
+            const barEnergy = document.getElementById('bar-energy');
+            if (barTransport) barTransport.style.width = total > 0 ? ((breakdown.transport / total) * 100) + '%' : '0%';
+            if (barEnergy) barEnergy.style.width = total > 0 ? ((breakdown.energy / total) * 100) + '%' : '0%';
+            
+            document.getElementById('val-transport').textContent = breakdown.transport;
+            document.getElementById('val-energy').textContent = breakdown.energy;
+        }
+        
+        function renderPieChart(breakdown) {
+            const ctx = document.getElementById('pie-chart');
+            if (!ctx) return;
+            
+            if (pieChartInstance) {
+                pieChartInstance.destroy();
+            }
+            
+            const data = {
+                labels: ['Transport', 'Energy', 'Food', 'Other'],
+                datasets: [{
+                    data: [breakdown.transport, breakdown.energy, breakdown.food, breakdown.other],
+                    backgroundColor: ['#10b981', '#fbbf24', '#fb923c', '#38bdf8'],
+                    borderColor: '#18181b',
+                    borderWidth: 3,
+                    hoverOffset: 18
+                }]
+            };
+            
+            pieChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '72%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            align: 'center',
+                            labels: {
+                                boxWidth: 11,
+                                padding: 14,
+                                font: { size: 11, weight: 500 },
+                                color: '#71717a'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ctx.raw + ' kg (' + Math.round(ctx.raw / (breakdown.transport + breakdown.energy + breakdown.food + breakdown.other) * 100) + '%)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function showResults(results) {
+            currentResults = results;
+            
+            const section = document.getElementById('results-section');
+            section.classList.remove('hidden');
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Big number
+            document.getElementById('total-value').textContent = results.total;
+            
+            // Comparison
+            const indianAvg = 5.2;
+            const pctOfAvg = Math.round((results.total / indianAvg) * 100);
+            let compHTML = '';
+            
+            if (results.total < 3.8) {
+                compHTML = `<span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs bg-emerald-900 text-emerald-300">Well below Indian average (${pctOfAvg}%)</span>`;
+            } else if (results.total < 5.5) {
+                compHTML = `<span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs bg-teal-900 text-teal-300">Around Indian average (${pctOfAvg}%)</span>`;
+            } else {
+                compHTML = `<span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs bg-amber-900 text-amber-300">Above average (${pctOfAvg}% of Indian daily)</span>`;
+            }
+            document.getElementById('comparison-text').innerHTML = compHTML;
+            
+            // Eco score
+            const eco = getEcoScore(results.total);
+            const badge = document.getElementById('eco-score-badge');
+            badge.innerHTML = `<span class="font-bold">${eco.score}</span> <span class="font-normal text-xs">/ 100 • ${eco.label}</span>`;
+            badge.className = `inline-flex items-center px-4 h-8 rounded-2xl text-sm font-bold bg-${eco.color}-900 text-${eco.color}-300`;
+            
+            // Breakdown list + bars
+            renderBreakdown(results.breakdown, results.total);
+            
+            // Pie
+            renderPieChart(results.breakdown);
+            
+            // Recommendations
+            renderInsights(results.breakdown, results.total);
+            
+            // Hide whatif result if open
+            document.getElementById('whatif-result').classList.add('hidden');
+        }
+        
+        function hideResults() {
+            document.getElementById('results-section').classList.add('hidden');
+        }
+        
+        function calculateAndShowResults() {
+            const results = calculateFootprint();
+            showResults(results);
+        }
+        
+        function applyWhatIf(type) {
+            if (!currentResults) {
+                alert("Please calculate your footprint first.");
+                return;
+            }
+            
+            let newTotal = currentResults.total;
+            let message = '';
+            
+            if (type === 'metro') {
+                // Assume 50% of car/two-wheeler distance moved to public
+                const transportSaved = currentResults.breakdown.transport * 0.42;
+                newTotal = parseFloat((currentResults.total - transportSaved).toFixed(2));
+                message = `Switched significant car/two-wheeler km to metro/bus`;
+            } 
+            else if (type === 'diet') {
+                const foodSaved = Math.max(0, currentResults.breakdown.food - 2.4);
+                newTotal = parseFloat((currentResults.total - foodSaved * 0.55).toFixed(2));
+                message = `Reduced red meat frequency`;
+            } 
+            else if (type === 'energy') {
+                const energySaved = currentResults.breakdown.energy * 0.22;
+                newTotal = parseFloat((currentResults.total - energySaved).toFixed(2));
+                message = `Reduced AC / heavy appliance use`;
+            }
+            
+            // Show result
+            const whatifBox = document.getElementById('whatif-result');
+            document.getElementById('whatif-total').innerHTML = newTotal + ` <span class="text-xs text-zinc-400">(${message})</span>`;
+            whatifBox.classList.remove('hidden');
+            
+            // Temporarily update main number
+            const orig = document.getElementById('total-value').textContent;
+            document.getElementById('total-value').innerHTML = newTotal + `<span class="text-xs align-super ml-1 text-emerald-400">(-${(currentResults.total - newTotal).toFixed(1)})</span>`;
+            
+            setTimeout(() => {
+                if (!whatifBox.classList.contains('hidden')) {
+                    document.getElementById('total-value').textContent = orig;
+                }
+            }, 4200);
+        }
+        
+        function resetWhatIf() {
+            document.getElementById('whatif-result').classList.add('hidden');
+            if (currentResults) {
+                document.getElementById('total-value').textContent = currentResults.total;
+            }
+        }
+        
+        function renderInsights(breakdown, total) {
+            const container = document.getElementById('insights-list');
+            container.innerHTML = '';
+            
+            const recs = generateRecommendations(breakdown, total);
+            
+            recs.forEach(rec => {
+                const card = document.createElement('div');
+                card.className = `tip-card border border-zinc-700 bg-zinc-900 p-5 rounded-3xl flex gap-4`;
+                card.innerHTML = `
+                    <div class="mt-0.5">
+                        <i class="fa-solid ${rec.icon} text-xl text-emerald-400"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-semibold">${rec.title}</div>
+                        <div class="text-xs text-zinc-300 mt-1 leading-snug">${rec.text}</div>
+                        <div class="mt-2">
+                            <span class="inline-block text-[10px] px-2.5 py-px rounded bg-zinc-800 text-emerald-400">${rec.impact} impact</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            
+            // If no dynamic, show some defaults
+            if (recs.length === 0) {
+                container.innerHTML = `
+                    <div class="tip-card border border-zinc-700 bg-zinc-900 p-5 rounded-3xl">
+                        <div class="font-semibold">Track consistently for 7 days</div>
+                        <div class="text-xs mt-1 text-zinc-300">Seeing your own trend is the fastest way to build better habits.</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // HISTORY MANAGEMENT
+        function getHistory() {
+            try {
+                const data = localStorage.getItem('ecotrack_history');
+                return data ? JSON.parse(data) : [];
+            } catch(e) { return []; }
+        }
+        
+        function saveHistory(history) {
+            localStorage.setItem('ecotrack_history', JSON.stringify(history));
+        }
+        
+        function logCurrentToHistory() {
+            if (!currentResults) return;
+            
+            const history = getHistory();
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Prevent duplicate for same day (update if exists)
+            const existingIndex = history.findIndex(h => h.date === today);
+            
+            const entry = {
+                date: today,
+                total: currentResults.total,
+                breakdown: currentResults.breakdown,
+                timestamp: Date.now()
+            };
+            
+            if (existingIndex >= 0) {
+                history[existingIndex] = entry;
+            } else {
+                history.push(entry);
+            }
+            
+            // Keep last 45 days
+            history.sort((a, b) => b.date.localeCompare(a.date));
+            if (history.length > 45) history.length = 45;
+            
+            saveHistory(history);
+            
+            // Visual feedback
+            const btns = document.querySelectorAll('#results-section button');
+            const origText = event.currentTarget ? event.currentTarget.innerHTML : '';
+            
+            // Show success toast-ish
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-5 right-5 bg-emerald-600 text-white text-xs px-5 py-3 rounded-2xl flex items-center gap-x-2 shadow-xl z-[200]`;
+            toast.innerHTML = `<i class="fa-solid fa-check"></i> <span>Logged to your history!</span>`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transition = 'all 0.3s';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 200);
+            }, 1600);
+            
+            // Refresh trends
+            renderHistory();
+        }
+        
+        function renderHistory() {
+            const history = getHistory();
+            const tbody = document.getElementById('history-table-body');
+            tbody.innerHTML = '';
+            
+            if (history.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="px-5 py-8 text-center text-xs text-zinc-400">No entries yet. Log your first calculation above.</td></tr>`;
+                updateHistoryStats([]);
+                return;
+            }
+            
+            // Sort newest first
+            const sorted = [...history].sort((a, b) => b.date.localeCompare(a.date));
+            
+            sorted.slice(0, 12).forEach((entry, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-zinc-900/70';
+                
+                const dateObj = new Date(entry.date);
+                const dateStr = dateObj.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+                
+                tr.innerHTML = `
+                    <td class="px-5 py-3 font-medium text-xs">${dateStr}</td>
+                    <td class="px-5 py-3 text-right font-mono font-semibold">${entry.total}</td>
+                    <td class="px-4 py-3 text-right font-mono text-xs hidden md:table-cell">${entry.breakdown.transport}</td>
+                    <td class="px-4 py-3 text-right font-mono text-xs hidden md:table-cell">${entry.breakdown.energy}</td>
+                    <td class="px-4 py-3 text-right font-mono text-xs hidden md:table-cell">${entry.breakdown.food}</td>
+                    <td class="px-4 py-3 text-right font-mono text-xs hidden md:table-cell">${entry.breakdown.other}</td>
+                    <td class="px-2 py-3">
+                        <button onclick="deleteHistoryEntry(${idx}, '${entry.date}')" class="text-red-400/70 hover:text-red-400 p-1">
+                            <i class="fa-solid fa-trash text-xs"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            updateHistoryStats(history);
+            renderTrendChart(history);
+        }
+        
+        function updateHistoryStats(history) {
+            const totalEl = document.getElementById('total-entries');
+            const streakEl = document.getElementById('streak-value');
+            const avgEl = document.getElementById('avg-7day');
+            
+            totalEl.textContent = history.length;
+            
+            if (history.length === 0) {
+                streakEl.textContent = '—';
+                avgEl.textContent = '—';
+                return;
+            }
+            
+            // Calculate streak
+            const sortedDates = history.map(h => h.date).sort().reverse();
+            let streak = 1;
+            const today = new Date().toISOString().split('T')[0];
+            
+            for (let i = 0; i < sortedDates.length - 1; i++) {
+                const d1 = new Date(sortedDates[i]);
+                const d2 = new Date(sortedDates[i + 1]);
+                const diff = Math.floor((d1 - d2) / (1000 * 3600 * 24));
+                
+                if (diff === 1) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            
+            // If today not logged, streak might be from yesterday
+            if (!sortedDates.includes(today) && streak > 0) {
+                // check if yesterday is there
+            }
+            
+            streakEl.textContent = streak;
+            
+            // 7 day avg
+            const last7 = history.slice(0, 7);
+            const avg = last7.length > 0 ? (last7.reduce((sum, h) => sum + h.total, 0) / last7.length).toFixed(1) : '—';
+            avgEl.textContent = avg;
+        }
+        
+        function renderTrendChart(history) {
+            const ctx = document.getElementById('trend-chart');
+            if (!ctx) return;
+            
+            if (trendChartInstance) {
+                trendChartInstance.destroy();
+            }
+            
+            if (!history || history.length === 0) {
+                // show placeholder text somehow
+                return;
+            }
+            
+            const sorted = [...history].sort((a, b) => a.date.localeCompare(b.date));
+            
+            const labels = sorted.map(h => {
+                const d = new Date(h.date);
+                return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+            });
+            
+            const data = sorted.map(h => h.total);
+            
+            trendChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Daily CO₂e (kg)',
+                        data: data,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 2.5,
+                        tension: 0.35,
+                        fill: true,
+                        pointRadius: 2.5,
+                        pointHoverRadius: 5,
+                        pointBackgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#27272a' },
+                            ticks: { color: '#52525b', font: { size: 10 } }
+                        },
+                        x: {
+                            grid: { color: '#27272a' },
+                            ticks: { color: '#52525b', font: { size: 9 } }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    elements: {
+                        line: { tension: 0.3 }
+                    }
+                }
+            });
+        }
+        
+        function deleteHistoryEntry(indexInSorted, date) {
+            if (!confirm('Delete this entry?')) return;
+            
+            let history = getHistory();
+            history = history.filter(h => h.date !== date);
+            saveHistory(history);
+            renderHistory();
+        }
+        
+        function clearHistory() {
+            if (!confirm('Clear ALL history? This cannot be undone.')) return;
+            localStorage.removeItem('ecotrack_history');
+            renderHistory();
+        }
+        
+        function exportHistory() {
+            const history = getHistory();
+            if (history.length === 0) {
+                alert("No history to export yet.");
+                return;
+            }
+            
+            let csv = 'Date,Total kgCO2e,Transport,Energy,Food,Other\n';
+            
+            history.forEach(h => {
+                csv += `${h.date},${h.total},${h.breakdown.transport},${h.breakdown.energy},${h.breakdown.food},${h.breakdown.other}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ecotrack-history-${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function applyWhatIfFromHistory() {
+            // placeholder if needed
+        }
+        
+        // Profile
+        function showProfileModal() {
+            const modal = document.getElementById('profile-modal');
+            const nameInput = document.getElementById('profile-name');
+            
+            const savedName = localStorage.getItem('ecotrack_name') || 'Anandakrishnan';
+            nameInput.value = savedName;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        
+        function hideProfileModal() {
+            const modal = document.getElementById('profile-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+        
+        function saveProfile() {
+            const name = document.getElementById('profile-name').value.trim() || 'User';
+            localStorage.setItem('ecotrack_name', name);
+            
+            // update nav
+            const navName = document.getElementById('nav-username');
+            if (navName) navName.textContent = name.split(' ')[0];
+            
+            hideProfileModal();
+        }
+        
+        function showSourcesModal() {
+            const modal = document.getElementById('sources-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        
+        function hideSourcesModal() {
+            const modal = document.getElementById('sources-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+        
+        function updateNavName() {
+            const saved = localStorage.getItem('ecotrack_name') || 'Anandakrishnan';
+            const el = document.getElementById('nav-username');
+            if (el) el.textContent = saved.split(' ')[0];
+        }
+        
+        function loadDemoData() {
+            // Fill a nice demo and calculate
+            const carKm = document.getElementById('car-km');
+            const carKmNum = document.getElementById('car-km-num');
+            const publicKm = document.getElementById('public-km');
+            const publicKmNum = document.getElementById('public-km-num');
+            const electricity = document.getElementById('electricity');
+            const electricityNum = document.getElementById('electricity-num');
+            
+            carKm.value = 15;
+            carKmNum.value = 15;
+            publicKm.value = 22;
+            publicKmNum.value = 22;
+            document.getElementById('car-type').value = 'two_wheeler';
+            electricity.value = 8.5;
+            electricityNum.value = 8.5;
+            document.getElementById('diet-type').value = 'vegetarian';
+            document.getElementById('consumption').value = 'medium';
+            document.getElementById('flight').value = '0';
+            document.getElementById('notes').value = 'Demo data loaded — typical sustainable day in Chennai';
+            
+            updateAllSliders();
+            
+            // Auto calculate
+            setTimeout(() => {
+                calculateAndShowResults();
+            }, 420);
+        }
+        
+        function initializeSliders() {
+            // Set initial values and listeners
+            ['car-km', 'public-km', 'electricity'].forEach(id => {
+                const slider = document.getElementById(id);
+                const num = document.getElementById(id + '-num');
+                
+                if (slider) {
+                    slider.addEventListener('input', () => updateSliderValue(id));
+                    
+                    // initial sync
+                    if (num) num.value = slider.value;
+                    const valEl = document.getElementById(id + '-value');
+                    if (valEl) valEl.textContent = parseFloat(slider.value).toFixed(id === 'electricity' ? 1 : 0);
+                }
+                
+                if (num) {
+                    num.addEventListener('input', () => syncSlider(id));
+                }
+            });
+            
+            // Initial demo-ish values
+            setTimeout(() => {
+                const carSlider = document.getElementById('car-km');
+                if (carSlider && parseFloat(carSlider.value) === 18) {
+                    // already good defaults
+                }
+            }, 50);
+        }
+        
+        function initializeEverything() {
+            initTailwind();
+            initializeSliders();
+            updateNavName();
+            
+            // Load initial history
+            renderHistory();
+            
+            // Keyboard support
+            document.addEventListener('keydown', function(e) {
+                if (e.key === '/' && document.activeElement.tagName === 'BODY') {
+                    e.preventDefault();
+                    document.getElementById('calculator').scrollIntoView({behavior:'smooth'});
+                }
+            });
+            
+            // Seed one demo entry if completely empty (first time user)
+            const hist = getHistory();
+            if (hist.length === 0) {
+                // Optional: do nothing, or seed one example
+                // For better first experience, perhaps seed a sample
+                setTimeout(() => {
+                    // Uncomment if you want a sample entry on first load
+                    // const sample = { date: '2026-06-18', total: 4.8, breakdown: {transport:1.9, energy:1.4, food:1.3, other:0.2} };
+                    // localStorage.setItem('ecotrack_history', JSON.stringify([sample]));
+                    // renderHistory();
+                }, 1200);
+            }
+            
+            // Make sure sliders show values
+            setTimeout(updateAllSliders, 80);
+            
+            // Easter egg / tip
+            console.log('%c[EcoTrack] Built for Hack2skill Main Challenge 3. Data is sovereign — stays in browser. Good luck on the leaderboard!', 'color:#166534');
+        }
+        
+        // Boot app
+        window.onload = function() {
+            initializeEverything();
+        };
+        
+        // Expose a couple helpers for debugging / judges
+        window.EcoTrack = {
+            calculate: () => calculateFootprint(),
+            getHistory: () => getHistory(),
+            resetAll: () => { localStorage.clear(); location.reload(); }
+        };
+    </script>
+</body>
+</html>
