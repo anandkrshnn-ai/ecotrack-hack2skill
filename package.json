@@ -1,20 +1,20 @@
 {
   "name": "ecotrack-hack2skill",
   "version": "1.0.0",
-  "description": "**Built for Hack2skill Main Challenge 3 — June 2026**",
+  "description": "Privacy-first carbon footprint awareness platform. Built for Hack2skill Main Challenge 3, June 2026.",
   "main": "index.html",
   "scripts": {
     "test": "jest --coverage",
-    "test:ci": "jest --coverage --ci"
+    "test:ci": "jest --coverage --ci --forceExit",
+    "test:watch": "jest --watch"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/anandkrshnn-ai/ecotrack-hack2skill.git"
   },
-  "keywords": ["carbon-footprint", "sustainability", "ecotrack"],
+  "keywords": ["carbon-footprint", "sustainability", "ecotrack", "climate", "india", "hack2skill"],
   "author": "Anandakrishnan Damodaran",
-  "license": "ISC",
-  "type": "commonjs",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/anandkrshnn-ai/ecotrack-hack2skill/issues"
   },
@@ -27,8 +27,14 @@
     "testEnvironment": "node",
     "collectCoverage": true,
     "coverageDirectory": "coverage",
+    "coverageReporters": ["text", "lcov", "html"],
     "coverageThreshold": {
-      "global": { "lines": 70, "functions": 70, "branches": 60 }
+      "global": {
+        "lines": 80,
+        "functions": 80,
+        "branches": 70,
+        "statements": 80
+      }
     }
   }
 }
