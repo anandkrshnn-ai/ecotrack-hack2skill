@@ -1581,26 +1581,34 @@
         
         function exportHistory() {
             const history = getHistory();
-            if (history.length === 0) {
+            if (!history || history.length === 0) {
                 alert("No history to export yet.");
                 return;
             }
             
-            let csv = 'Date,Total kgCO2e,Transport,Energy,Food,Other\n';
+            // Add BOM for Excel UTF-8 compatibility
+            let csv = '\uFEFFDate,Total kgCO2e,Transport,Energy,Food,Other\n';
             
             history.forEach(h => {
-                csv += `${h.date},${h.total},${h.breakdown.transport},${h.breakdown.energy},${h.breakdown.food},${h.breakdown.other}\n`;
+                // Safe fallbacks for older/corrupted local storage entries
+                const b = h.breakdown || {};
+                csv += `${h.date || 'Unknown'},${h.total || 0},${b.transport || 0},${b.energy || 0},${b.food || 0},${b.other || 0}\n`;
             });
             
-            const blob = new Blob([csv], { type: 'text/csv' });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
+            a.style.display = 'none';
             a.download = `ecotrack-history-${new Date().toISOString().slice(0,10)}.csv`;
             document.body.appendChild(a);
             a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            
+            // Cleanup deferred to ensure download triggers properly
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 150);
         }
         
         function applyWhatIfFromHistory() {
