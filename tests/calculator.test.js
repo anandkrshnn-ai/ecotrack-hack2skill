@@ -4,15 +4,7 @@
  * input validation, preset scenarios, and all boundary conditions.
  */
 
-const FACTORS = {
-    transport: { two_wheeler: 0.09, car_petrol: 0.16, car_diesel: 0.14, car_ev: 0.06 },
-    public_transport: 0.05,
-    electricity: 0.78,
-    food: { vegan: 1.8, vegetarian: 2.6, mixed: 3.9, high_meat: 5.8 },
-    consumption: { low: 0.6, medium: 1.3, high: 2.4 },
-    flight_short: 2.8,
-    flight_medium: 6.5
-};
+const { FACTORS, getEcoScore, generateRecommendations } = require('../js/main.js');
 
 /**
  * Calculates total daily carbon footprint in kgCO2e.
@@ -42,18 +34,7 @@ function calculateMockFootprint(inputs) {
     return parseFloat((transport + energy + food + other).toFixed(2));
 }
 
-/**
- * Returns an eco-score (0-100) based on total daily footprint.
- * @param {number} total - Total kgCO2e
- * @returns {number} Eco score
- */
-function getEcoScoreMock(total) {
-    if (total <= 3.0) return 92;
-    if (total <= 4.5) return 78;
-    if (total <= 6.5) return 62;
-    if (total <= 9.0) return 45;
-    return 28;
-}
+
 
 /**
  * Returns percentage share of a category in total footprint.
@@ -244,33 +225,33 @@ describe('EcoTrack — Carbon Footprint Calculator', () => {
     });
 
     // ── Eco Score Bands ───────────────────────
-    describe('getEcoScoreMock() — all score bands', () => {
+    describe('getEcoScore() — all score bands', () => {
         test('score 92 for total <= 3.0 (excellent)', () => {
-            expect(getEcoScoreMock(1.0)).toBe(92);
-            expect(getEcoScoreMock(3.0)).toBe(92);
+            expect(getEcoScore(1.0).score).toBe(92);
+            expect(getEcoScore(3.0).score).toBe(92);
         });
         test('score 78 for 3.0 < total <= 4.5 (very good)', () => {
-            expect(getEcoScoreMock(3.1)).toBe(78);
-            expect(getEcoScoreMock(4.5)).toBe(78);
+            expect(getEcoScore(3.1).score).toBe(78);
+            expect(getEcoScore(4.5).score).toBe(78);
         });
         test('score 62 for 4.5 < total <= 6.5 (good)', () => {
-            expect(getEcoScoreMock(4.6)).toBe(62);
-            expect(getEcoScoreMock(6.5)).toBe(62);
+            expect(getEcoScore(4.6).score).toBe(62);
+            expect(getEcoScore(6.5).score).toBe(62);
         });
         test('score 45 for 6.5 < total <= 9.0 (average)', () => {
-            expect(getEcoScoreMock(6.6)).toBe(45);
-            expect(getEcoScoreMock(9.0)).toBe(45);
+            expect(getEcoScore(6.6).score).toBe(45);
+            expect(getEcoScore(9.0).score).toBe(45);
         });
         test('score 28 for total > 9.0 (high impact)', () => {
-            expect(getEcoScoreMock(9.1)).toBe(28);
-            expect(getEcoScoreMock(28.13)).toBe(28);
+            expect(getEcoScore(9.1).score).toBe(28);
+            expect(getEcoScore(28.13).score).toBe(28);
         });
         test('scores are strictly decreasing as footprint increases', () => {
-            const s1 = getEcoScoreMock(2.0);
-            const s2 = getEcoScoreMock(4.0);
-            const s3 = getEcoScoreMock(6.0);
-            const s4 = getEcoScoreMock(8.0);
-            const s5 = getEcoScoreMock(12.0);
+            const s1 = getEcoScore(2.0).score;
+            const s2 = getEcoScore(4.0).score;
+            const s3 = getEcoScore(6.0).score;
+            const s4 = getEcoScore(8.0).score;
+            const s5 = getEcoScore(12.0).score;
             expect(s1).toBeGreaterThan(s2);
             expect(s2).toBeGreaterThan(s3);
             expect(s3).toBeGreaterThan(s4);
@@ -314,7 +295,7 @@ describe('EcoTrack — Carbon Footprint Calculator', () => {
                 electricityKwh: 5.5, dietType: 'vegan',
                 consumptionLevel: 'low', flight: '0'
             });
-            expect(getEcoScoreMock(result)).toBe(45);
+            expect(getEcoScore(result).score).toBe(45);
         });
 
         test('High Impact preset produces score 28 (lowest eco-score band)', () => {
@@ -323,7 +304,7 @@ describe('EcoTrack — Carbon Footprint Calculator', () => {
                 electricityKwh: 16, dietType: 'high_meat',
                 consumptionLevel: 'high', flight: '0'
             });
-            expect(getEcoScoreMock(result)).toBe(28);
+            expect(getEcoScore(result).score).toBe(28);
         });
 
         test('transport category is highest emitter in high-impact preset', () => {

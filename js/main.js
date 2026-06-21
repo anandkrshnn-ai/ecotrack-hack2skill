@@ -1067,3 +1067,9 @@ document.addEventListener('click', (e) => {
         deleteHistoryEntry(idx, date);
     }
 });
+
+
+// CommonJS exports for Jest testing
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { FACTORS, getEcoScore, generateRecommendations };
+}
