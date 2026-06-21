@@ -1,3 +1,10 @@
+/**
+ * @fileoverview User Interface management for EcoTrack.
+ * Contains logic for rendering charts, updating DOM elements, 
+ * applying presets, and animating visual transitions.
+ * @module ui
+ */
+
 // Tailwind script
         function initTailwind() {
             document.documentElement.style.setProperty('--accent', '#10b981');
@@ -19,7 +26,15 @@
         let trendChartInstance = null;
         let currentResults = null;
         
-        // Easing number ticker
+        /**
+         * Animates a numerical value in the DOM from a start value to an end value.
+         * Uses outQuad easing for a smooth deceleration effect.
+         * 
+         * @param {string} id - The DOM element ID to update
+         * @param {number} start - The starting numerical value
+         * @param {number} end - The final numerical value to reach
+         * @param {number} duration - Animation duration in milliseconds
+         */
         function animateNumberValue(id, start, end, duration) {
             const obj = document.getElementById(id);
             if (!obj) return;
@@ -288,6 +303,10 @@
             document.getElementById('results-section').classList.add('hidden');
         }
         
+        /**
+         * Orchestrates the footprint calculation and triggers the UI update.
+         * Fetches data from calculator logic and passes it to the UI renderer.
+         */
         function calculateAndShowResults() {
             const results = calculateFootprint();
             showResults(results);

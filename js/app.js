@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Main entry point for EcoTrack application.
+ * Handles DOM event delegation, initialization of UI components, and
+ * wiring up of event listeners for all interactive elements.
+ * @module app
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
     const el_auto_bind_1 = document.getElementById('auto-bind-1');
     if(el_auto_bind_1) el_auto_bind_1.addEventListener('click', (event) => {
