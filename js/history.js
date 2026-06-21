@@ -21,12 +21,14 @@ function getHistory() {
          * Saves the history array to localStorage.
          * @param {Array} history - The array to save
          */
+        function saveHistory(history) {
+            localStorage.setItem('ecotrack_history', JSON.stringify(history));
+        }
         
         /**
          * Logs the currently displayed results to local storage history.
          * Handles duplicate entries for the same day and maintains a 45-day limit.
          */
-        function logCurrentToHistory() {
             if (!currentResults) return;
             
             const history = getHistory();
