@@ -4,7 +4,7 @@
  * input validation, preset scenarios, and all boundary conditions.
  */
 
-const { FACTORS, getEcoScore, generateRecommendations } = require('../js/calculator.js');
+const { FACTORS, getEcoScore, generateRecommendations } = require('../js/main.js');
 
 /**
  * Calculates total daily carbon footprint in kgCO2e.
@@ -33,8 +33,6 @@ function calculateMockFootprint(inputs) {
     const other = FACTORS.consumption[inputs.consumptionLevel] || 1.3;
     return parseFloat((transport + energy + food + other).toFixed(2));
 }
-
-
 
 /**
  * Returns percentage share of a category in total footprint.
@@ -108,9 +106,6 @@ describe('EcoTrack — Carbon Footprint Calculator', () => {
                 electricityKwh: 10.5, dietType: 'mixed',
                 consumptionLevel: 'medium', flight: '0'
             });
-            // transport: 22*0.09 + 14*0.05 = 1.98+0.70 = 2.68
-            // energy: 10.5*0.78 = 8.19
-            // food: 3.9, other: 1.3 => total: 16.07
             expect(result).toBe(16.07);
         });
 
@@ -120,7 +115,6 @@ describe('EcoTrack — Carbon Footprint Calculator', () => {
                 electricityKwh: 8, dietType: 'vegetarian',
                 consumptionLevel: 'medium', flight: '0'
             });
-            // transport: 30*0.14=4.2, energy: 8*0.78=6.24, food:2.6, other:1.3 => 14.34
             expect(result).toBe(14.34);
         });
 
@@ -312,7 +306,7 @@ describe('EcoTrack — Carbon Footprint Calculator', () => {
             const transport = parseFloat((carKm * 0.16 + publicKm * 0.05).toFixed(2));
             const energy = parseFloat((16 * 0.78).toFixed(2));
             expect(transport).toBeGreaterThan(0);
-            expect(energy).toBeGreaterThan(transport); // energy dominates at 16kWh
+            expect(energy).toBeGreaterThan(transport);
         });
 
         test('switching car_petrol to car_ev reduces transport by 62.5%', () => {
