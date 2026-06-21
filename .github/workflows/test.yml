@@ -15,10 +15,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
 
       - name: Install dependencies
@@ -40,17 +40,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Check required files exist
         run: |
           echo "Checking required project files..."
-          test -f index.html && echo "✅ index.html"
-          test -f README.md && echo "✅ README.md"
-          test -f CONTRIBUTING.md && echo "✅ CONTRIBUTING.md"
-          test -f SECURITY.md && echo "✅ SECURITY.md"
+          test -f index.html        && echo "✅ index.html"
+          test -f README.md         && echo "✅ README.md"
+          test -f CONTRIBUTING.md   && echo "✅ CONTRIBUTING.md"
+          test -f SECURITY.md       && echo "✅ SECURITY.md"
+          test -f package.json      && echo "✅ package.json"
+          test -f package-lock.json && echo "✅ package-lock.json"
           test -f tests/calculator.test.js && echo "✅ tests/calculator.test.js"
-          test -f package.json && echo "✅ package.json"
           echo "All required files present."
 
       - name: Check repository size is under 10MB
