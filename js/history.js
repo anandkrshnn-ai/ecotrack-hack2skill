@@ -1,12 +1,26 @@
-        }
-        
+"use strict";
+
+/**
+ * @fileoverview Manages local storage history, charting, and data exports.
+ * @module history
+ */
+
+// HISTORY MANAGEMENT
+/**
+ * Retrieves the history data from localStorage.
+ * @returns {Array} Array of history entry objects
+ */
+function getHistory() {
+    try {
+        const data = localStorage.getItem('ecotrack_history');
+        return data ? JSON.parse(data) : [];
+    } catch(e) { return []; }
+}
+
         /**
          * Saves the history array to localStorage.
          * @param {Array} history - The array to save
          */
-        function saveHistory(history) {
-            localStorage.setItem('ecotrack_history', JSON.stringify(history));
-        }
         
         /**
          * Logs the currently displayed results to local storage history.
