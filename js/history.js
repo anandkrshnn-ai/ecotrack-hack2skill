@@ -1,15 +1,17 @@
-// HISTORY MANAGEMENT
-        function getHistory() {
-            try {
-                const data = localStorage.getItem('ecotrack_history');
-                return data ? JSON.parse(data) : [];
-            } catch(e) { return []; }
         }
         
+        /**
+         * Saves the history array to localStorage.
+         * @param {Array} history - The array to save
+         */
         function saveHistory(history) {
             localStorage.setItem('ecotrack_history', JSON.stringify(history));
         }
         
+        /**
+         * Logs the currently displayed results to local storage history.
+         * Handles duplicate entries for the same day and maintains a 45-day limit.
+         */
         function logCurrentToHistory() {
             if (!currentResults) return;
             
@@ -58,6 +60,9 @@
             renderHistory();
         }
         
+        /**
+         * Renders the history table in the DOM based on local storage data.
+         */
         function renderHistory() {
             const history = getHistory();
             const tbody = document.getElementById('history-table-body');
@@ -99,6 +104,10 @@
             renderTrendChart(history);
         }
         
+        /**
+         * Updates streak and average statistics based on history data.
+         * @param {Array} history - The history array
+         */
         function updateHistoryStats(history) {
             const totalEl = document.getElementById('total-entries');
             const streakEl = document.getElementById('streak-value');
@@ -142,6 +151,10 @@
             avgEl.textContent = avg;
         }
         
+        /**
+         * Renders the trend chart using Chart.js based on history.
+         * @param {Array} history - The history array
+         */
         function renderTrendChart(history) {
             const ctx = document.getElementById('trend-chart');
             if (!ctx) return;
@@ -209,6 +222,11 @@
             });
         }
         
+        /**
+         * Deletes a specific history entry.
+         * @param {number} indexInSorted - Index of the entry in the sorted view (unused currently)
+         * @param {string} date - The date string of the entry to delete
+         */
         function deleteHistoryEntry(indexInSorted, date) {
             if (!confirm('Delete this entry?')) return;
             
@@ -218,12 +236,18 @@
             renderHistory();
         }
         
+        /**
+         * Clears all history entries after user confirmation.
+         */
         function clearHistory() {
             if (!confirm('Clear ALL history? This cannot be undone.')) return;
             localStorage.removeItem('ecotrack_history');
             renderHistory();
         }
         
+        /**
+         * Exports the user's history as a downloadable CSV file.
+         */
         function exportHistory() {
             const history = getHistory();
             if (!history || history.length === 0) {

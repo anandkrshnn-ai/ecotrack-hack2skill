@@ -1,3 +1,11 @@
+"use strict";
+
+/**
+ * @fileoverview Core calculation logic for carbon footprint.
+ * Contains emission factors, footprint calculation, scoring, and recommendations.
+ * @module calculator
+ */
+
 // Emission Factors (kgCO2e)
         const FACTORS = {
             transport: {
@@ -24,6 +32,11 @@
         };
         
         
+/**
+ * Calculates the total carbon footprint and breakdown based on DOM inputs.
+ * 
+ * @returns {Object} Result object containing total, breakdown, and original inputs
+ */
 function calculateFootprint() {
             const carKm = parseFloat(document.getElementById('car-km').value) || 0;
             const publicKm = parseFloat(document.getElementById('public-km').value) || 0;
@@ -67,6 +80,12 @@ function calculateFootprint() {
         }
         
         
+/**
+ * Determines an eco-score, label, and UI color based on total footprint.
+ * 
+ * @param {number} total - The total carbon footprint in kgCO2e
+ * @returns {Object} Score object with score, label, and color properties
+ */
 function getEcoScore(total) {
             // Simple scoring: lower is better. Max score 95 for very low footprint
             if (total <= 3.0) return { score: 92, label: "Excellent", color: "emerald" };
@@ -77,6 +96,13 @@ function getEcoScore(total) {
         }
         
         
+/**
+ * Generates actionable recommendations based on the footprint breakdown.
+ * 
+ * @param {Object} breakdown - Breakdown of emissions by category
+ * @param {number} total - The total carbon footprint
+ * @returns {Array} List of recommendation objects
+ */
 function generateRecommendations(breakdown, total) {
             const recs = [];
             const transportPct = (breakdown.transport / total) * 100;

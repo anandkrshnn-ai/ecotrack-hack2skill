@@ -5,6 +5,8 @@
  * @module app
  */
 
+"use strict";
+
 document.addEventListener('DOMContentLoaded', () => {
     const el_auto_bind_1 = document.getElementById('auto-bind-1');
     if(el_auto_bind_1) el_auto_bind_1.addEventListener('click', (event) => {

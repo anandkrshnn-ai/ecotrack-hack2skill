@@ -57,6 +57,15 @@ ecotrack-hack2skill/
 
 ---
 
+## Architecture & Code Quality
+
+The application strictly adheres to modern JavaScript best practices to ensure optimal **Code Quality** and **Maintainability**:
+- **Modular Design:** Logic is strictly separated into core mathematical logic (`calculator.js`), state management and data persistence (`history.js`), UI rendering and DOM updates (`ui.js`), and event delegation (`app.js`).
+- **Strict Mode & JSDoc:** All modules run in `"use strict"` mode and are comprehensively documented using JSDoc to ensure clean, type-hinted code behavior.
+- **Zero Inline Event Handlers:** The HTML remains purely declarative. All events are attached dynamically via robust event delegation in `app.js`, strictly separating concerns and adhering to strict Content Security Policy (CSP) rules.
+
+---
+
 ## Running Locally
 
 ```bash

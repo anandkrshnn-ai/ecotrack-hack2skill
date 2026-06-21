@@ -5,6 +5,8 @@
  * @module ui
  */
 
+"use strict";
+
 // Tailwind script
         function initTailwind() {
             document.documentElement.style.setProperty('--accent', '#10b981');
@@ -57,19 +59,27 @@
             window.requestAnimationFrame(step);
         }
         
-        function updateSliderValue(id) {
-            const slider = document.getElementById(id);
-            const numInput = document.getElementById(id + '-num');
-            const valueEl = document.getElementById(id + '-value');
+        /**
+         * Syncs slider value to its corresponding numeric input field.
+         * @param {string} baseId - The base ID of the slider
+         */
+        function updateSliderValue(baseId) {
+            const slider = document.getElementById(baseId);
+            const numInput = document.getElementById(baseId + '-num');
+            const valueEl = document.getElementById(baseId + '-value');
             
             if (numInput) numInput.value = slider.value;
-            if (valueEl) valueEl.textContent = parseFloat(slider.value).toFixed(id === 'electricity' ? 1 : 0);
+            if (valueEl) valueEl.textContent = parseFloat(slider.value).toFixed(baseId === 'electricity' ? 1 : 0);
         }
         
-        function syncSlider(id) {
-            const numInput = document.getElementById(id + '-num');
-            const slider = document.getElementById(id);
-            const valueEl = document.getElementById(id + '-value');
+        /**
+         * Syncs numeric input field back to its corresponding slider.
+         * @param {string} baseId - The base ID of the slider
+         */
+        function syncSlider(baseId) {
+            const numInput = document.getElementById(baseId + '-num');
+            const slider = document.getElementById(baseId);
+            const valueEl = document.getElementById(baseId + '-value');
             
             if (!numInput || !slider) return;
             
@@ -256,6 +266,10 @@
             });
         }
         
+        /**
+         * Displays the calculation results in the UI, including animations and charts.
+         * @param {Object} results - The results object from the calculator
+         */
         function showResults(results) {
             currentResults = results;
             
@@ -299,6 +313,9 @@
             document.getElementById('whatif-result').classList.add('hidden');
         }
         
+        /**
+         * Hides the results section.
+         */
         function hideResults() {
             document.getElementById('results-section').classList.add('hidden');
         }
