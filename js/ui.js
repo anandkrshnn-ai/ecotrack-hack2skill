@@ -7,14 +7,6 @@
 
 "use strict";
 
-"use strict";
-
-/**
- * @fileoverview User Interface management for EcoTrack.
- * Contains logic for rendering charts, updating DOM elements, 
- * applying presets, and animating visual transitions.
- * @module ui
- */
 
 const EcoUI = (function() {
     // Tailwind script
@@ -34,10 +26,28 @@ const EcoUI = (function() {
         }
     }
     
+    // Configuration Constants
+    const CONFIG = {
+        ANIM_DURATION: 950,
+        WHATIF_TIMEOUT: 4200,
+        INDIAN_AVG: 5.2,
+        BAR_DELAY: 80,
+        WHATIF_IMPACT: {
+            METRO_PCT: 0.42,
+            DIET_BASE: 2.4,
+            DIET_PCT: 0.55,
+            ENERGY_PCT: 0.22
+        }
+    };
+
     let pieChartInstance = null;
     let trendChartInstance = null;
     let currentResults = null;
     
+    /**
+     * Gets the currently displayed calculation results.
+     * @returns {Object|null} The current results object
+     */
     function getCurrentResults() {
         return currentResults;
     }
@@ -109,6 +119,10 @@ const EcoUI = (function() {
         if (valueEl) valueEl.textContent = val.toFixed(baseId === 'electricity' ? 1 : 0);
     }
     
+    /**
+     * Applies a predefined preset of values to the input sliders.
+     * @param {string} type - The preset type ('reset', 'chennai-weekday', 'low-impact', 'high-impact')
+     */
     function applyPreset(type) {
         // Deselect all preset buttons visually
         document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active', 'border-emerald-600'));
@@ -170,6 +184,9 @@ const EcoUI = (function() {
         if (activeBtn) activeBtn.classList.add('active', 'border-emerald-600');
     }
     
+    /**
+     * Updates all numeric inputs and visual text to match their corresponding sliders.
+     */
     function updateAllSliders() {
         ['car-km', 'public-km', 'electricity'].forEach(id => {
             const slider = document.getElementById(id);
@@ -182,6 +199,11 @@ const EcoUI = (function() {
         });
     }
     
+    /**
+     * Renders the category breakdown list and visual bars.
+     * @param {Object} breakdown - The breakdown of emissions by category
+     * @param {number} total - The total carbon footprint
+     */
     function renderBreakdown(breakdown, total) {
         const container = document.getElementById('breakdown-list');
         container.innerHTML = '';
@@ -220,7 +242,7 @@ const EcoUI = (function() {
             setTimeout(() => {
                 const bar = div.querySelector(`.bg-${cat.color}-400`);
                 if (bar) bar.style.width = `${pct}%`;
-            }, 80);
+            }, CONFIG.BAR_DELAY);
         });
         
         // Update bar visuals in results header area
@@ -233,6 +255,10 @@ const EcoUI = (function() {
         document.getElementById('val-energy').textContent = breakdown.energy;
     }
     
+    /**
+     * Renders a doughnut chart visualizing the emission breakdown.
+     * @param {Object} breakdown - The breakdown of emissions by category
+     */
     function renderPieChart(breakdown) {
         const ctx = document.getElementById('pie-chart');
         if (!ctx) return;
@@ -292,10 +318,10 @@ const EcoUI = (function() {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
         
         // Big number (Animated count-up)
-        animateNumberValue('total-value', 0.0, results.total, 950);
+        animateNumberValue('total-value', 0.0, results.total, CONFIG.ANIM_DURATION);
         
         // Comparison
-        const indianAvg = 5.2;
+        const indianAvg = CONFIG.INDIAN_AVG;
         const pctOfAvg = Math.round((results.total / indianAvg) * 100);
         let compHTML = '';
         
@@ -343,6 +369,10 @@ const EcoUI = (function() {
         showResults(results);
     }
     
+    /**
+     * Simulates a "what-if" scenario by applying behavioral changes to current results.
+     * @param {string} type - The scenario type ('metro', 'diet', 'energy')
+     */
     function applyWhatIf(type) {
         if (!currentResults) {
             alert("Please calculate your footprint first.");
@@ -354,17 +384,17 @@ const EcoUI = (function() {
         
         if (type === 'metro') {
             // Assume 50% of car/two-wheeler distance moved to public
-            const transportSaved = currentResults.breakdown.transport * 0.42;
+            const transportSaved = currentResults.breakdown.transport * CONFIG.WHATIF_IMPACT.METRO_PCT;
             newTotal = parseFloat((currentResults.total - transportSaved).toFixed(2));
             message = `Switched significant car/two-wheeler km to metro/bus`;
         } 
         else if (type === 'diet') {
-            const foodSaved = Math.max(0, currentResults.breakdown.food - 2.4);
-            newTotal = parseFloat((currentResults.total - foodSaved * 0.55).toFixed(2));
+            const foodSaved = Math.max(0, currentResults.breakdown.food - CONFIG.WHATIF_IMPACT.DIET_BASE);
+            newTotal = parseFloat((currentResults.total - foodSaved * CONFIG.WHATIF_IMPACT.DIET_PCT).toFixed(2));
             message = `Reduced red meat frequency`;
         } 
         else if (type === 'energy') {
-            const energySaved = currentResults.breakdown.energy * 0.22;
+            const energySaved = currentResults.breakdown.energy * CONFIG.WHATIF_IMPACT.ENERGY_PCT;
             newTotal = parseFloat((currentResults.total - energySaved).toFixed(2));
             message = `Reduced AC / heavy appliance use`;
         }
@@ -382,9 +412,12 @@ const EcoUI = (function() {
             if (!whatifBox.classList.contains('hidden')) {
                 document.getElementById('total-value').textContent = orig;
             }
-        }, 4200);
+        }, CONFIG.WHATIF_TIMEOUT);
     }
     
+    /**
+     * Resets the UI back to the actual calculated results, hiding the what-if simulation.
+     */
     function resetWhatIf() {
         document.getElementById('whatif-result').classList.add('hidden');
         if (currentResults) {
@@ -392,6 +425,11 @@ const EcoUI = (function() {
         }
     }
     
+    /**
+     * Renders personalized insights and recommendations based on the calculation.
+     * @param {Object} breakdown - The breakdown of emissions by category
+     * @param {number} total - The total carbon footprint
+     */
     function renderInsights(breakdown, total) {
         const container = document.getElementById('insights-list');
         container.innerHTML = '';

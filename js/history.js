@@ -6,6 +6,15 @@
  */
 
 const EcoHistory = (function() {
+    // Configuration Constants
+    const CONFIG = {
+        MAX_HISTORY_DAYS: 45,
+        RENDER_LIMIT: 12,
+        TOAST_TIMEOUT: 1600,
+        TOAST_FADE: 200,
+        CHART_TENSION: 0.35
+    };
+
     // HISTORY MANAGEMENT
     /**
      * Retrieves the history data from localStorage.
@@ -54,9 +63,9 @@ const EcoHistory = (function() {
             history.push(entry);
         }
         
-        // Keep last 45 days
+        // Keep last CONFIG.MAX_HISTORY_DAYS days
         history.sort((a, b) => b.date.localeCompare(a.date));
-        if (history.length > 45) history.length = 45;
+        if (history.length > CONFIG.MAX_HISTORY_DAYS) history.length = CONFIG.MAX_HISTORY_DAYS;
         
         saveHistory(history);
         
@@ -73,8 +82,8 @@ const EcoHistory = (function() {
         setTimeout(() => {
             toast.style.transition = 'all 0.3s';
             toast.style.opacity = '0';
-            setTimeout(() => toast.remove(), 200);
-        }, 1600);
+            setTimeout(() => toast.remove(), CONFIG.TOAST_FADE);
+        }, CONFIG.TOAST_TIMEOUT);
         
         // Refresh trends
         renderHistory();
@@ -98,7 +107,7 @@ const EcoHistory = (function() {
         // Sort newest first
         const sorted = [...history].sort((a, b) => b.date.localeCompare(a.date));
         
-        sorted.slice(0, 12).forEach((entry, idx) => {
+        sorted.slice(0, CONFIG.RENDER_LIMIT).forEach((entry, idx) => {
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-zinc-900/70';
             
@@ -296,11 +305,17 @@ const EcoHistory = (function() {
         }, 150);
     }
     
+    /**
+     * Placeholder function to apply "what-if" scenario directly from history.
+     */
     function applyWhatIfFromHistory() {
         // placeholder
     }
     
     // Profile
+    /**
+     * Shows the user profile modal for name editing.
+     */
     function showProfileModal() {
         const modal = document.getElementById('profile-modal');
         const nameInput = document.getElementById('profile-name');
@@ -312,12 +327,18 @@ const EcoHistory = (function() {
         modal.classList.add('flex');
     }
     
+    /**
+     * Hides the user profile modal.
+     */
     function hideProfileModal() {
         const modal = document.getElementById('profile-modal');
         modal.classList.remove('flex');
         modal.classList.add('hidden');
     }
     
+    /**
+     * Saves the user's profile name to localStorage and updates the UI.
+     */
     function saveProfile() {
         const name = document.getElementById('profile-name').value.trim() || 'User';
         localStorage.setItem('ecotrack_name', name);
@@ -328,24 +349,36 @@ const EcoHistory = (function() {
         hideProfileModal();
     }
     
+    /**
+     * Shows the modal displaying data sources and methodology.
+     */
     function showSourcesModal() {
         const modal = document.getElementById('sources-modal');
         modal.classList.remove('hidden');
         modal.classList.add('flex');
     }
     
+    /**
+     * Hides the data sources modal.
+     */
     function hideSourcesModal() {
         const modal = document.getElementById('sources-modal');
         modal.classList.remove('flex');
         modal.classList.add('hidden');
     }
     
+    /**
+     * Updates the username in the navigation bar from localStorage.
+     */
     function updateNavName() {
         const saved = localStorage.getItem('ecotrack_name') || 'Anandakrishnan';
         const el = document.getElementById('nav-username');
         if (el) el.textContent = saved.split(' ')[0];
     }
     
+    /**
+     * Populates the calculator with a preset demo dataset to demonstrate functionality.
+     */
     function loadDemoData() {
         const carKm = document.getElementById('car-km');
         const carKmNum = document.getElementById('car-km-num');
@@ -373,6 +406,9 @@ const EcoHistory = (function() {
         }, 420);
     }
     
+    /**
+     * Initializes all interactive sliders with their event listeners and initial values.
+     */
     function initializeSliders() {
         ['car-km', 'public-km', 'electricity'].forEach(id => {
             const slider = document.getElementById(id);
@@ -392,6 +428,10 @@ const EcoHistory = (function() {
         });
     }
     
+    /**
+     * Master initialization function for the EcoTrack application.
+     * Sets up UI, renders history, and binds core event listeners.
+     */
     function initializeEverything() {
         if (window.EcoTrack && window.EcoTrack.UI) window.EcoTrack.UI.initTailwind();
         initializeSliders();

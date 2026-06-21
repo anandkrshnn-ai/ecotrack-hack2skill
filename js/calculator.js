@@ -31,6 +31,36 @@ const EcoCalculator = (function() {
         flight_short: 2.8,
         flight_medium: 6.5
     };
+
+    // Configuration Constants
+    const CONFIG = {
+        DEFAULTS: {
+            CAR_FACTOR: 0.15,
+            FOOD: 3.5,
+            OTHER: 1.3
+        },
+        THRESHOLDS: {
+            SCORE_EXCELLENT: 3.0,
+            SCORE_VERY_GOOD: 4.5,
+            SCORE_GOOD: 6.5,
+            SCORE_AVERAGE: 9.0,
+            REC_TRANSPORT_PCT: 38,
+            REC_FOOD_PCT: 42,
+            REC_FOOD_ABS: 4.2,
+            REC_ENERGY_PCT: 28,
+            REC_ENERGY_ABS: 3.0,
+            REC_GREAT_TOTAL: 4.2,
+            REC_HIGH_TOTAL: 8.0
+        },
+        SCORES: {
+            EXCELLENT: 92,
+            VERY_GOOD: 78,
+            GOOD: 62,
+            AVERAGE: 45,
+            HIGH_IMPACT: 28
+        }
+    };
+
     
     /**
      * Calculates the total carbon footprint and breakdown based on DOM inputs.
@@ -49,7 +79,7 @@ const EcoCalculator = (function() {
         let transport = 0;
         
         // Car / Two-wheeler
-        const carFactor = FACTORS.transport[carType] || 0.15;
+        const carFactor = FACTORS.transport[carType] || CONFIG.DEFAULTS.CAR_FACTOR;
         transport += carKm * carFactor;
         
         // Public
@@ -60,8 +90,8 @@ const EcoCalculator = (function() {
         if (flight === 'medium') transport += FACTORS.flight_medium;
         
         const energy = electricityKwh * FACTORS.electricity;
-        const food = FACTORS.food[dietType] || 3.5;
-        const other = FACTORS.consumption[consumptionLevel] || 1.3;
+        const food = FACTORS.food[dietType] || CONFIG.DEFAULTS.FOOD;
+        const other = FACTORS.consumption[consumptionLevel] || CONFIG.DEFAULTS.OTHER;
         
         const total = transport + energy + food + other;
         
@@ -87,11 +117,11 @@ const EcoCalculator = (function() {
      */
     function getEcoScore(total) {
         // Simple scoring: lower is better. Max score 95 for very low footprint
-        if (total <= 3.0) return { score: 92, label: "Excellent", color: "emerald" };
-        if (total <= 4.5) return { score: 78, label: "Very Good", color: "emerald" };
-        if (total <= 6.5) return { score: 62, label: "Good", color: "teal" };
-        if (total <= 9.0) return { score: 45, label: "Average", color: "amber" };
-        return { score: 28, label: "High Impact", color: "rose" };
+        if (total <= CONFIG.THRESHOLDS.SCORE_EXCELLENT) return { score: CONFIG.SCORES.EXCELLENT, label: "Excellent", color: "emerald" };
+        if (total <= CONFIG.THRESHOLDS.SCORE_VERY_GOOD) return { score: CONFIG.SCORES.VERY_GOOD, label: "Very Good", color: "emerald" };
+        if (total <= CONFIG.THRESHOLDS.SCORE_GOOD) return { score: CONFIG.SCORES.GOOD, label: "Good", color: "teal" };
+        if (total <= CONFIG.THRESHOLDS.SCORE_AVERAGE) return { score: CONFIG.SCORES.AVERAGE, label: "Average", color: "amber" };
+        return { score: CONFIG.SCORES.HIGH_IMPACT, label: "High Impact", color: "rose" };
     }
     
     /**
@@ -107,7 +137,7 @@ const EcoCalculator = (function() {
         const foodPct = (breakdown.food / total) * 100;
         const energyPct = (breakdown.energy / total) * 100;
         
-        if (transportPct > 38) {
+        if (transportPct > CONFIG.THRESHOLDS.REC_TRANSPORT_PCT) {
             recs.push({
                 icon: "fa-car-side",
                 title: "Mobility is your top lever",
@@ -116,7 +146,7 @@ const EcoCalculator = (function() {
             });
         }
         
-        if (foodPct > 42 || breakdown.food > 4.2) {
+        if (foodPct > CONFIG.THRESHOLDS.REC_FOOD_PCT || breakdown.food > CONFIG.THRESHOLDS.REC_FOOD_ABS) {
             recs.push({
                 icon: "fa-utensils",
                 title: "Shift 2–3 meals to plant-forward",
@@ -125,7 +155,7 @@ const EcoCalculator = (function() {
             });
         }
         
-        if (energyPct > 28 && breakdown.energy > 3) {
+        if (energyPct > CONFIG.THRESHOLDS.REC_ENERGY_PCT && breakdown.energy > CONFIG.THRESHOLDS.REC_ENERGY_ABS) {
             recs.push({
                 icon: "fa-bolt-lightning",
                 title: "Optimize cooling & appliances",
@@ -134,14 +164,14 @@ const EcoCalculator = (function() {
             });
         }
         
-        if (total < 4.2) {
+        if (total < CONFIG.THRESHOLDS.REC_GREAT_TOTAL) {
             recs.push({
                 icon: "fa-tachometer-alt",
                 title: "You're already doing great!",
                 text: "Your footprint is well below the Indian average. Share your habits — inspire friends and family.",
                 impact: "Inspire"
             });
-        } else if (total > 8) {
+        } else if (total > CONFIG.THRESHOLDS.REC_HIGH_TOTAL) {
             recs.push({
                 icon: "fa-exclamation-triangle",
                 title: "High impact day — focus on 1 change",
