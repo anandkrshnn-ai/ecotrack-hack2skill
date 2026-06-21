@@ -4,7 +4,7 @@
  * input validation, preset scenarios, and all boundary conditions.
  */
 
-const { FACTORS, getEcoScore, generateRecommendations } = require('../js/main.js');
+const { FACTORS, getEcoScore, generateRecommendations } = require('../js/calculator.js');
 
 /**
  * Calculates total daily carbon footprint in kgCO2e.
